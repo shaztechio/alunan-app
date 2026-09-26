@@ -59,7 +59,24 @@ Update its Features, Platforms, and Status sections when those change. Do not
 advertise downloads, hardware support, or platform availability before they are
 released and measured.
 
-No analytics are included. Bunyi's PostHog project key belongs to Bunyi; add a
-separate Alunan project only by explicit decision, and never in the app itself.
+## Analytics
+
+`index.html` loads [PostHog](https://posthog.com) to count visits to this site,
+using Alunan's own PostHog project (added 2026-09-26 at the owner's request).
+**The apps do not:** FEATURES.md APP-004 rules out telemetry in the MVP, so the
+snippet stays in `docs/` and nowhere else. The `phc_` value is a public,
+write-only project key meant for client-side HTML; it is not Bunyi's key and
+not a personal API key.
+
+Events and the PostHog script go through the managed reverse proxy
+`t.shaztech.io`, as on bunyi.app; `ui_host` points PostHog's own links back at
+its US region. The snippet is PostHog's standard one. Bunyi's page also sets
+`disable_surveys: true` and `capture_performance: false`, which it measured as
+saving about 40 KB per visit for its project; they are not applied here until
+measured for this project. Nothing else on the page depends on the script, so
+the site renders the same when it is blocked.
+
+## Link previews
+
 There is no `og:image` yet; add an absolute `https://alunan.app/assets/...`
 card once an app icon exists.
