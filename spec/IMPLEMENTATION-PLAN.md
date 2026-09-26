@@ -18,8 +18,10 @@ No production native application or release acceptance gate has passed.
 - Windows: WinForms. Linux: GTK 4/Gir.Core. macOS: Swift with SwiftUI/AppKit.
 - Install the app with all application runtimes and redistributable engine
   dependencies. No terminals, dependency installers, or separately run server.
-- Standard installers contain no model weights. Generate downloads only missing
-  required model assets, verifies them, and continues automatically.
+- Standard installers contain no model weights or vendor GPU runtime packs.
+  Generate downloads only missing required model assets and, where the backend
+  needs one, the pinned vendor GPU runtime pack, verifies them, and continues
+  automatically.
 - Installed models work offline; downloading never uploads song inputs or audio.
 - The app supervises a private generation process. Use pipes; no localhost HTTP
   listener or user-configurable service is part of the application.
@@ -217,12 +219,16 @@ Work:
 - [ ] P2-06 Implement preflight checks and Download, Verify, Remove, and local-pack
   import services. Source-selection and storage semantics must agree in C# and
   Swift. No UI polish is required yet, but errors must retain structured context.
+- [ ] P2-07 Implement GPU runtime pack preparation (MOD-015): pinned vendor archive
+  download and resume, archive verification, allow-listed extraction with per-file
+  digests, a separate runtime cache, offline import of the pinned archive, and a
+  pre-launch full-hash check. Cover AC-017 at the service level.
 
 Deliverables: C# and Swift preparation services, curated test catalog, deterministic
 transfer tests, cache/import fixtures, and progress observation traces.
 
-**Exit gate:** service-level cases for AC-003 through AC-011 and AC-014 pass in both
-implementations. Verify offline cache use with network requests prohibited, not
+**Exit gate:** service-level cases for AC-003 through AC-011, AC-014, and AC-017
+pass in both implementations. Verify offline cache use with network requests prohibited, not
 merely with a fast cached response. Stop/resume a real large model file once on
 each implementation as a bounded integration check. Native UI evidence follows
 in phase 4; service tests alone do not complete those acceptance scenarios.
@@ -241,7 +247,9 @@ Work:
   loading. Reject unsupported profile/engine combinations before model load.
 - [ ] P3-03 Implement process supervision in C# and Swift: hidden launch, handshake,
   separate diagnostics, crash detection, shutdown, and cleanup on parent exit.
-  Select and test OS-specific lifetime controls for child processes.
+  Select and test OS-specific lifetime controls for child processes. Load GPU
+  runtime libraries only by full path from the verified runtime cache; prove a
+  same-named library in PATH, the app folder, or the working directory is ignored.
 - [ ] P3-04 Keep the control channel responsive during inference. Wire cooperative
   cancellation through every supported stage, then bounded process termination
   if the engine cannot stop. Choose the grace period from measurements and keep
@@ -329,7 +337,7 @@ gaps remain explicit; compiling a shared service does not complete a native UI.
 
 Work:
 
-- [ ] P6-01 Run every AC-001 through AC-016 scenario against identified candidate
+- [ ] P6-01 Run every AC-001 through AC-017 scenario against identified candidate
   builds and model profiles. Record failures against requirement IDs and retest
   affected behavior after fixes.
 - [ ] P6-02 Use deterministic transport tests for partial/unknown responses, range
@@ -350,7 +358,7 @@ Work:
 Deliverables: acceptance ledger, failure/recovery report, accessibility results,
 updated compatibility measurements, and resolved defect records.
 
-**Exit gate:** all 16 acceptance scenarios have passing evidence on each supported
+**Exit gate:** all 17 acceptance scenarios have passing evidence on each supported
 platform, with scope-specific hardware evidence for real generation. Fix blockers
 before release. A new OS or engine exception requires a feature-spec update;
 adding a footnote to this plan cannot waive a product requirement.
@@ -366,8 +374,8 @@ Work:
   macOS signing/notarization arrangements; include required redistributable notices.
 - [ ] P7-02 Verify the final packaged catalog: immutable sources/revisions, expected
   sizes and hashes, complete generator/decoder/config asset sets, and license data.
-  There must be no model weights, developer credentials, or environment-specific
-  absolute paths in standard application packages.
+  There must be no model weights, vendor GPU runtime packs, developer credentials,
+  or environment-specific absolute paths in standard application packages.
 - [ ] P7-03 Install the exact candidate packages on clean supported systems with
   no development tools or separately installed application runtimes. Verify first
   model download from the real approved origin and a later fully offline song.
@@ -404,6 +412,7 @@ work; the feature specification remains authoritative if wording changes.
 | MOD-001 through MOD-010, MOD-013 through MOD-014 | 0, 2, 4 | AC-002 through AC-007, AC-011, AC-014 |
 | MOD-011 through MOD-012 | 2, 5 | AC-014, AC-015 |
 | DL-001 through DL-009 | 2, 4, 5 | AC-008, AC-009, AC-015 |
+| MOD-015 | 0, 2, 3, 4 | AC-002, AC-003, AC-017 on final packages |
 | NET-001 through NET-007 | 2, 4 | AC-005 through AC-010; path/source isolation cases |
 | OUT-001 through OUT-005 | 3, 4, 5, 7 | AC-012 through AC-014, AC-016 |
 | UX-001 through UX-003 | 4, 5 | AC-011, AC-012, AC-015 |
@@ -419,6 +428,7 @@ than using unverified download sizes, memory figures, or calendar estimates.
 | Decision | Resolve by | Basis |
 | --- | --- | --- |
 | Engine/backend and redistributable dependency set | End of phase 0 | Complete measured generation and bundled-runtime feasibility on each target. |
+| Vendor GPU runtime pack terms and pins | End of phase 0 | Confirm NVIDIA terms permit end-user download of the pinned redistributable archive by the app, the notices to show, and the archive/file pins per platform. |
 | Approved model distribution terms | End of phase 0 | Apache-2.0 source license selected and applied; exact selected components/weights still need distribution review. |
 | Candidate OS/architecture/GPU profiles and GTK baseline | End of phase 0; confirm in 6 | Actual compatibility, memory, quality, and latency evidence. |
 | Model revisions, origin, full asset set, hashes | End of phase 0; verify in 7 | Immutable files and approved distribution; no invented Lagu mirror. |

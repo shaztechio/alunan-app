@@ -89,8 +89,42 @@ restrict called APIs accordingly, and verify runtime symbol availability in
 Phase 1. Avoid relying on distro-installed GTK or a developer's PATH.
 
 CUDA toolkits are build-machine tools. A working GPU driver is the user's machine
-prerequisite; redistributable runtime libraries belong in the application package.
-Validate exact DLL/SO imports and their license terms before final packaging.
+prerequisite. Small runtime libraries (MSVC runtime, OpenMP, statically linked
+cudart) belong in the application package. Validate exact DLL/SO imports and
+their license terms before final packaging.
+
+### GPU runtime pack decision (2026-09-26)
+
+The Windows CUDA build needs cuBLAS and cuBLASLt, about 516 MB uncompressed,
+which would dominate the installer. The user rejected a separate CUDA installer
+as too large and selected **on-demand download from the vendor**: the app
+prepares a pinned NVIDIA redistributable archive as a GPU runtime pack during the
+first CUDA generation, alongside the model. FEATURES.md APP-002/005/006, MOD-001,
+MOD-011..013, the new MOD-015, and AC-017 carry the product rules; DATA-FORMATS.md
+defines the catalog record and a separate `runtimes/` cache.
+
+The candidate pin matches the toolkit that built the recorded binaries (CUDA
+13.3.1 redistrib manifest, cuBLAS 13.6.0.2):
+
+| Platform | Vendor archive | Bytes | SHA-256 |
+| --- | --- | ---: | --- |
+| Windows x64 | `https://developer.download.nvidia.com/compute/cuda/redist/libcublas/windows-x86_64/libcublas-windows-x86_64-13.6.0.2-archive.zip` | 393,706,755 | `62e9fa30560c8f0a28e0cdcf9d6fc1fed347bcfab8847239b9ae1fdc1d86408a` |
+| Linux x64 | `libcublas-linux-x86_64-13.6.0.2-archive.tar.xz` in the same manifest | 817,981,368 | Pin when the Linux build is evaluated |
+
+These values come from NVIDIA's published `redistrib_13.3.1.json` and have not
+been downloaded or extracted. Before Phase 0 closes: download and verify the
+archive, confirm its `cublas64_13.dll`/`cublasLt64_13.dll` match the files the
+build was tested with, record per-file digests, test full-path loading with the
+toolkit absent, and review whether NVIDIA's terms permit the app to fetch the
+archive for the user and which notices to show. The Linux archive is larger than
+the Windows DLLs because it includes static libraries; that user-visible cost
+is recorded rather than avoided. If the terms review fails, return to FEATURES.md
+before choosing another distribution method.
+
+Downloading executable code is the main new risk. The rules therefore go beyond
+the model cache: catalog-pinned archive and per-file digests, allow-listed
+extraction, a separate cache, full hashing before each helper launch, and
+full-path loading so a planted same-named library cannot be picked up.
 
 ## Decisions still required to close Phase 0
 
@@ -98,7 +132,8 @@ Validate exact DLL/SO imports and their license terms before final packaging.
 2. Compare official and candidate stages/outputs; conduct recorded listening.
 3. Obtain an Apple Silicon Mac and test Metal before choosing a Mac backend.
 4. Measure startup, memory, repeated jobs, cancellation/failures, and disk peaks.
-5. Freeze final dependency binaries/hashes and approve model origins/notices.
+5. Freeze final dependency binaries/hashes and approve model origins/notices,
+   including the GPU runtime pack pins and NVIDIA download terms.
 6. Agree on quality/latency limits from measurements.
 
 The user selected **Apache-2.0** for Lagu source on 2026-09-26; the full text is

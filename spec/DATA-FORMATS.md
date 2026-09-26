@@ -31,10 +31,17 @@ must contain verified values before a model can be offered.
 | Asset | Stable `assetId`, immutable `revision`, `relativePath`, `sizeBytes`, `sha256`, role, and curated source identity/locator. All assets in a selected profile are required; optional capabilities use their own asset sets. |
 | Source | Stable `sourceId`, canonical HTTPS locator at an immutable revision, and source attribution. Temporary redirect URLs are transport data only. |
 | License | Model/component name, license identifier or title, bundled notice path, source URL, and applicable additional terms. |
+| Runtime pack | Stable `runtimePackId`, vendor, component, version, platform/architecture, the backends and profiles that require it, canonical vendor archive URL, archive `sizeBytes` and `sha256`, archive format, and the complete list of files to extract, each with `relativePath` inside the archive, destination name, `sizeBytes`, and `sha256`. Includes a license record for the vendor terms. |
 
 An asset list can be embedded or supplied by an external manifest whose SHA-256
 is embedded in the catalog. A remote file and a digest from the same unpinned
 endpoint alone do not establish the catalog's expected artifact identity.
+
+Runtime packs are catalog data like profiles: the catalog pins the vendor archive
+and every extracted file. No vendor manifest fetched at run time can add, rename,
+or re-pin files. Extraction ignores every archive entry not listed, and a listed
+entry that is missing, duplicated, a link, or outside its expected path fails the
+pack.
 
 Cache identity comprises source ID, runtime format, profile/artifact revision,
 and expected digest. GGUF, MLX, and original PyTorch weights are distinct assets.
@@ -54,6 +61,23 @@ models/
     transfer.json
     ready.json
 ```
+
+GPU runtime packs use a separate root so model removal never deletes loaded code
+and vice versa:
+
+```text
+runtimes/
+  <runtime-pack-id>/
+    archive/<archive-name>.incomplete   # partial vendor archive; deleted after extraction
+    files/<destination-name>            # extracted, individually verified libraries
+    transfer.json
+    ready.json
+```
+
+Runtime `ready.json` records the pack identity, archive digest, and each extracted
+file's verified digest and length. Unlike model receipts, it does not replace the
+full per-file hash required before each helper launch (MOD-015). The helper's
+library search must name this `files/` directory explicitly.
 
 Catalog IDs must be safe opaque path components, not raw URLs. If identifiers
 require mapping, use a stable collision-resistant encoding consistently across
@@ -98,8 +122,8 @@ engines, quantizations, hardware, or runtime versions.
 
 Implementations share these semantics, whether progress comes from C# or Swift:
 
-`jobId`, `phase`, `profileId`, `assetId`, current filename, retained unique bytes,
-total bytes or null, current-file retained bytes/total, actual network bytes
+`jobId`, `phase`, `profileId`, `assetId` or `runtimePackId`, current filename,
+retained unique bytes, total bytes or null, current-file retained bytes/total, actual network bytes
 received, last-receipt time, attempt elapsed time, and optional retry deadline.
 
 Completion and network traffic are separate counters. Each reconnect may receive
