@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import platform
 import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -21,7 +22,19 @@ import traceback
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_BUILD = ROOT / ".phase0/yue2-cpp-build-cuda-sm89"
-BINARIES = ("yue-synth.exe", "ggml.dll", "ggml-base.dll", "ggml-cpu.dll", "ggml-cuda.dll")
+WINDOWS = sys.platform == "win32"
+ENGINE = "yue-synth.exe" if WINDOWS else "yue-synth"
+LIBRARY_SUFFIXES = (".dll", ".dylib", ".so")
+
+
+def engine_files(build):
+    """The engine executable plus every shared library the build placed beside it."""
+    names = sorted(p.name for p in build.iterdir()
+                   if p.is_file() and (p.name == ENGINE or p.name.lower().endswith(LIBRARY_SUFFIXES)
+                                       or ".so." in p.name))
+    if ENGINE not in names:
+        raise FileNotFoundError(f"{ENGINE} not found in {build}")
+    return names
 
 
 def digest(path):
@@ -36,6 +49,9 @@ def save_json(path, value):
 
 
 def gpu_used_bytes():
+    """Device-wide NVIDIA memory in use, or None where nvidia-smi is unavailable (for example macOS)."""
+    if not shutil.which("nvidia-smi"):
+        return None
     out = subprocess.run(["nvidia-smi", "--query-gpu=memory.used", "--format=csv,noheader,nounits", "-i", "0"],
                          capture_output=True, text=True, check=True).stdout
     return int(out.strip()) * 1024 * 1024
@@ -69,7 +85,7 @@ def main():
     report = {
         "schemaVersion": 1, "status": "running", "engine": "yue2-cpp",
         "platform": platform.platform(), "requestSha256": digest(args.request), "runs": [],
-        "memoryScope": "yue-synth process RSS sampled every 100 ms; GPU is device-wide nvidia-smi memory.used sampled every 250 ms minus the pre-run baseline, including any other GPU clients",
+        "memoryScope": "yue-synth process RSS sampled every 100 ms; on NVIDIA systems GPU is device-wide nvidia-smi memory.used sampled every 250 ms minus the pre-run baseline, including any other GPU clients; on macOS system-wide used memory is sampled instead because Metal allocations are not all counted in RSS",
         "networkScope": "Not intercepted. Binaries import no WinSock/WinHTTP DLLs; not an OS firewall test",
         "cacheState": "Not flushed; each run is a new process but files may be in the OS cache",
     }
@@ -77,8 +93,8 @@ def main():
     import psutil
     import soundfile as sf
     try:
-        report["binaries"] = {name: digest(args.build / name) for name in BINARIES}
-        version = subprocess.run([str(args.build / "yue-synth.exe"), "--help"], capture_output=True, text=True)
+        report["binaries"] = {name: digest(args.build / name) for name in engine_files(args.build)}
+        version = subprocess.run([str(args.build / ENGINE), "--help"], capture_output=True, text=True)
         report["engineVersion"] = (version.stdout + version.stderr).strip().splitlines()[0]
         lock = json.loads((ROOT / "docs/validation/phase0/model-profiles.lock.json").read_text(encoding="utf-8-sig"))
         profile = next(p for p in lock["profiles"] if p["id"] == "yue2-cpp-q8")
@@ -109,11 +125,12 @@ def main():
             take = args.output / f"take-{index + 1}"
             take.mkdir()
             wav = take / "audio.wav"
-            command = [str(args.build / "yue-synth.exe"), "--model", str(model), "--vae", str(vae),
+            command = [str(args.build / ENGINE), "--model", str(model), "--vae", str(vae),
                        "--request", str(request_path), "--out", str(wav), "--score", str(take / "score.abc"),
                        "--tokens", str(take / "tokens.csv"), "--latent", str(take / "latent.vae")]
             baseline = gpu_used_bytes()
-            peaks = {"rss": 0, "gpu": baseline}
+            system_baseline = psutil.virtual_memory().used
+            peaks = {"rss": 0, "gpu": baseline, "system": system_baseline}
             modules = set()
             stop = threading.Event()
             before = time.perf_counter()
@@ -130,7 +147,9 @@ def main():
                             pass
                         ticks += 1
                         if ticks % 3 == 0:
-                            peaks["gpu"] = max(peaks["gpu"], gpu_used_bytes())
+                            if baseline is not None:
+                                peaks["gpu"] = max(peaks["gpu"], gpu_used_bytes())
+                            peaks["system"] = max(peaks["system"], psutil.virtual_memory().used)
                         if args.runtime_dir and ticks % 10 == 0:
                             try:
                                 modules.update(m.path for m in proc.memory_maps() if m.path.lower().endswith(".dll"))
@@ -146,7 +165,9 @@ def main():
             text = (take / "stderr.log").read_text(encoding="utf-8", errors="replace")
             run = {"index": index + 1, "exitCode": code, "processSeconds": seconds,
                    "peakRssBytes": peaks["rss"], "gpuBaselineBytes": baseline,
-                   "peakGpuUsedAboveBaselineBytes": peaks["gpu"] - baseline,
+                   "peakGpuUsedAboveBaselineBytes": peaks["gpu"] - baseline if baseline is not None else None,
+                   "systemMemoryBaselineBytes": system_baseline,
+                   "peakSystemMemoryAboveBaselineBytes": peaks["system"] - system_baseline,
                    "arStages": re.findall(r"\[AR\] [^\n]*", text),
                    "truncated": "(truncated)" in text, "listeningReview": "not performed"}
             if args.runtime_dir:

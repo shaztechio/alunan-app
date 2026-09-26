@@ -183,3 +183,10 @@ the engine without its app-local runtime DLLs, a load check, one generation, and
 every DLL the process maps. In the sandbox there is no CUDA device, so the
 engine falls back to the CPU. On another NVIDIA PC, copy the bundle and the two
 GGUFs and run the script there.
+
+## Other platforms
+
+[`MACOS-RUNBOOK.md`](MACOS-RUNBOOK.md) is the step-by-step procedure for the
+Apple Silicon Mac evaluation. `prepare-models.py` is a cross-platform
+equivalent of `prepare-models.ps1`, and `run-cpp.py` runs on macOS and Linux as
+well as Windows (engine name, library hashing, and memory sampling adapt).
