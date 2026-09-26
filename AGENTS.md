@@ -41,8 +41,12 @@ the automated version-bump commit a release workflow pushes (see Releases).
    `dotnet` (shared Windows/Linux code), `spec`, `site`, `engine`, `phase0`.
    Squash-merged titles become release-note lines, so a non-conventional title
    ends up under "Other changes".
-3. CI must pass on the PR before merging.
-4. Stacked PRs merge bottom-up: merge the PR based on `main` first, retarget the
+3. Use Conventional Commit messages for every commit, not only PR titles: the
+   subject line follows the same format and rules as above, and any body
+   explains what changed and why. When a squash merge takes its subject from a
+   commit rather than the edited PR title, the result must still be conventional.
+4. CI must pass on the PR before merging.
+5. Stacked PRs merge bottom-up: merge the PR based on `main` first, retarget the
    next one to `main`, then merge it. Merging out of order strands the upper work.
 
 ## Feature changes and platform parity
