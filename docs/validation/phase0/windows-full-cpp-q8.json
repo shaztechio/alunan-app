@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-technical-checks-listening-pending",
+  "engine": "yue2-cpp",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "requestSha256": "3816f8e6b6713411ba8fb3f4be5c2e270b55636c44c74bc4e842830c87ebb6da",
+  "runs": [
+    {
+      "index": 1,
+      "exitCode": 0,
+      "processSeconds": 37.68424830000731,
+      "peakRssBytes": 2533965824,
+      "gpuBaselineBytes": 1773142016,
+      "peakGpuUsedAboveBaselineBytes": 5751439360,
+      "truncated": false,
+      "listeningReview": "not performed",
+      "audioSeconds": 169.83866666666665,
+      "sampleRate": 48000,
+      "channels": 2,
+      "finiteNonSilentAudio": true,
+      "peakAbs": 1.072265625,
+      "wavSha256": "ddde2f996c3e079784a546e43298fb09955b0acdee29ee2618a44be65c68c99c",
+      "outputBytes": 66365003,
+      "arSummary": [
+        "[AR] Score song 0: end token at step 1809",
+        "[AR] Score: 1809 tokens over 1 songs, 1810 steps, 7.4 s (4.1 ms/step)",
+        "[AR] Semantic song 0: end token at step 4246",
+        "[AR] Semantic: 4246 tokens over 1 songs, 4247 steps, 14.8 s (3.5 ms/step)"
+      ],
+      "stageLog": [
+        "[WeightCtx] Loaded 311 tensors, 2195.1 MB into backend",
+        "[Store] Load LM: 1161 ms",
+        "[LM-KV] Allocated 1 sets x 28 layers (4D batched), 2688.0 MB",
+        "[WeightCtx] Loaded 317 tensors, 1433.5 MB into backend",
+        "[Store] Load NAR: 721 ms",
+        "[NAR] Solved: T_lat=4246, 1 variations, 32 steps, 11697 ms (365.5 ms/step)",
+        "[Store] Load VAE: 512 ms",
+        "[VAE] Tiled decode done: 9 tiles -> T_audio=8152256 (169.84s @ 48kHz), 868 ms",
+        "[Pipeline] Done: 1 tracks, 169.8 s of audio in 37.3 s (4.6x realtime)"
+      ]
+    }
+  ],
+  "memoryScope": "yue-synth process RSS sampled every 100 ms; GPU is device-wide nvidia-smi memory.used sampled every 250 ms minus the pre-run baseline, including any other GPU clients",
+  "networkScope": "Not intercepted. Binaries import no WinSock/WinHTTP DLLs; not an OS firewall test",
+  "cacheState": "Not flushed; each run is a new process but files may be in the OS cache",
+  "binaries": {
+    "yue-synth.exe": "d933ce730decc293f1c348cf4744860a57aa3d7d12aaa1a3924990f5e17c1709",
+    "ggml.dll": "1fc74276a4b1203216f46a681d4c4e91757a66c1745a9c18f361d910dd492fd3",
+    "ggml-base.dll": "43eff0f713e7f7725c7a1d0af830eca34d31362587858e9c39e26f54e8b35f17",
+    "ggml-cpu.dll": "20fc415e2c6025ec401d45275827340612aaffd8657afd0b94508a2f2539c214",
+    "ggml-cuda.dll": "76d2a96dfca62a45dcc3a4264a1e04ce00ab32b2c8db584040de5ded5d0ad078"
+  },
+  "engineVersion": "yue2.cpp f17d526 (2026-09-24)",
+  "profile": "yue2-cpp-q8",
+  "assetVerificationSeconds": 2.5300669000134803,
+  "effectiveRequest": {
+    "style": "English, melodic indie pop, clear lead vocal, piano, electric guitar, bass and drums, 100 BPM, uplifting chorus",
+    "lyrics": "[Verse 1]\nThe rain has left a silver line\nAcross the road we used to know\nI pack a little piece of time\nAnd follow where the rivers go\n\n[Pre-Chorus]\nEvery window catches light\nEvery step becomes a sound\nWe can make it through the night\nWith our feet upon the ground\n\n[Chorus]\nCarry the morning home with me\nOver the hills and through the trees\nThere is a song in all we see\nCarry the morning home with me\n\n[Verse 2]\nThe station clock is running slow\nA paper cup warms up my hands\nThere is so much I do not know\nAbout the shape of distant lands\n\n[Chorus]\nCarry the morning home with me\nOver the hills and through the trees\nThere is a song in all we see\nCarry the morning home with me\n\n[Bridge]\nIf the road should turn again\nIf the clouds should hide the blue\nWe will sing above the rain\nI will find my way with you\n\n[Chorus]\nCarry the morning home with me\nOver the hills and through the trees\nThere is a song in all we see\nCarry the morning home with me\n\n[Outro]\nOne more mile and we are free\nCarry the morning home with me\n[End]",
+    "cot": "full",
+    "lm_seed": 831001,
+    "seed": 831001,
+    "steps": 32,
+    "lm_batch_size": 1,
+    "synth_batch_size": 1,
+    "duration": 360.0,
+    "output_format": "wav32"
+  },
+  "totalSeconds": 40.43306290000328,
+  "fixture": "tools/phase0/requests/full.json",
+  "referenceComparison": "Different sampler/backend/quantization; audio is a different rendition, not expected to match the reference WAV"
+}

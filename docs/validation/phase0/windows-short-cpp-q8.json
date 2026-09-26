@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-technical-checks-listening-pending",
+  "engine": "yue2-cpp",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "requestSha256": "a71bd9ea65c401f5e9187b0093bd5bf1e187deeb525e749a83302742d2bdab46",
+  "runs": [
+    {
+      "index": 1,
+      "exitCode": 0,
+      "processSeconds": 14.34952659998089,
+      "peakRssBytes": 2461184000,
+      "gpuBaselineBytes": 1772093440,
+      "peakGpuUsedAboveBaselineBytes": 5610930176,
+      "truncated": false,
+      "listeningReview": "not performed",
+      "audioSeconds": 66.35866666666666,
+      "sampleRate": 48000,
+      "channels": 2,
+      "finiteNonSilentAudio": true,
+      "peakAbs": 0.97216796875,
+      "wavSha256": "7c7025c597fee071e0c4b40d6a8915d4e1bd384ccc4375db4b6c319a31adadca",
+      "outputBytes": 25932254,
+      "arSummary": [
+        "[AR] Score song 0: end token at step 673",
+        "[AR] Score: 673 tokens over 1 songs, 674 steps, 2.7 s (4.0 ms/step)",
+        "[AR] Semantic song 0: end token at step 1659",
+        "[AR] Semantic: 1659 tokens over 1 songs, 1660 steps, 5.2 s (3.1 ms/step)"
+      ],
+      "stageLog": [
+        "[WeightCtx] Loaded 311 tensors, 2195.1 MB into backend",
+        "[Store] Load LM: 1186 ms",
+        "[LM-KV] Allocated 1 sets x 28 layers (4D batched), 2688.0 MB",
+        "[WeightCtx] Loaded 317 tensors, 1433.5 MB into backend",
+        "[Store] Load NAR: 730 ms",
+        "[NAR] Solved: T_lat=1659, 1 variations, 32 steps, 3133 ms (97.9 ms/step)",
+        "[Store] Load VAE: 513 ms",
+        "[VAE] Tiled decode done: 4 tiles -> T_audio=3185216 (66.36s @ 48kHz), 413 ms",
+        "[Pipeline] Done: 1 tracks, 66.4 s of audio in 14.0 s (4.8x realtime)"
+      ]
+    },
+    {
+      "index": 2,
+      "exitCode": 0,
+      "processSeconds": 14.368049199983943,
+      "peakRssBytes": 2443333632,
+      "gpuBaselineBytes": 1769996288,
+      "peakGpuUsedAboveBaselineBytes": 5611978752,
+      "truncated": false,
+      "listeningReview": "not performed",
+      "audioSeconds": 66.35866666666666,
+      "sampleRate": 48000,
+      "channels": 2,
+      "finiteNonSilentAudio": true,
+      "peakAbs": 0.97216796875,
+      "wavSha256": "7c7025c597fee071e0c4b40d6a8915d4e1bd384ccc4375db4b6c319a31adadca",
+      "outputBytes": 25932253,
+      "arSummary": [
+        "[AR] Score song 0: end token at step 673",
+        "[AR] Score: 673 tokens over 1 songs, 674 steps, 2.7 s (4.0 ms/step)",
+        "[AR] Semantic song 0: end token at step 1659",
+        "[AR] Semantic: 1659 tokens over 1 songs, 1660 steps, 5.2 s (3.1 ms/step)"
+      ],
+      "stageLog": [
+        "[WeightCtx] Loaded 311 tensors, 2195.1 MB into backend",
+        "[Store] Load LM: 1204 ms",
+        "[LM-KV] Allocated 1 sets x 28 layers (4D batched), 2688.0 MB",
+        "[WeightCtx] Loaded 317 tensors, 1433.5 MB into backend",
+        "[Store] Load NAR: 731 ms",
+        "[NAR] Solved: T_lat=1659, 1 variations, 32 steps, 3131 ms (97.8 ms/step)",
+        "[Store] Load VAE: 509 ms",
+        "[VAE] Tiled decode done: 4 tiles -> T_audio=3185216 (66.36s @ 48kHz), 405 ms",
+        "[Pipeline] Done: 1 tracks, 66.4 s of audio in 14.0 s (4.7x realtime)"
+      ]
+    }
+  ],
+  "memoryScope": "yue-synth process RSS sampled every 100 ms; GPU is device-wide nvidia-smi memory.used sampled every 250 ms minus the pre-run baseline, including any other GPU clients",
+  "networkScope": "Not intercepted. Binaries import no WinSock/WinHTTP DLLs; not an OS firewall test",
+  "cacheState": "Not flushed; each run is a new process but files may be in the OS cache",
+  "binaries": {
+    "yue-synth.exe": "d933ce730decc293f1c348cf4744860a57aa3d7d12aaa1a3924990f5e17c1709",
+    "ggml.dll": "1fc74276a4b1203216f46a681d4c4e91757a66c1745a9c18f361d910dd492fd3",
+    "ggml-base.dll": "43eff0f713e7f7725c7a1d0af830eca34d31362587858e9c39e26f54e8b35f17",
+    "ggml-cpu.dll": "20fc415e2c6025ec401d45275827340612aaffd8657afd0b94508a2f2539c214",
+    "ggml-cuda.dll": "76d2a96dfca62a45dcc3a4264a1e04ce00ab32b2c8db584040de5ded5d0ad078"
+  },
+  "engineVersion": "yue2.cpp f17d526 (2026-09-24)",
+  "profile": "yue2-cpp-q8",
+  "assetVerificationSeconds": 2.527624600013951,
+  "effectiveRequest": {
+    "style": "English, acoustic folk pop, warm clear lead vocal, acoustic guitar, soft drums, 90 BPM",
+    "lyrics": "[Verse]\nMorning light across the floor\nI leave my worries at the door\n\n[Chorus]\nOne small song to start the day\nLet the music lead the way\n[End]",
+    "cot": "full",
+    "lm_seed": 831001,
+    "seed": 831001,
+    "steps": 32,
+    "lm_batch_size": 1,
+    "synth_batch_size": 1,
+    "duration": 360.0,
+    "output_format": "wav32"
+  },
+  "totalSeconds": 31.50260680000065,
+  "fixture": "tools/phase0/requests/short.json",
+  "referenceComparison": "Different sampler/backend/quantization; audio is a different rendition, not expected to match the reference WAV"
+}

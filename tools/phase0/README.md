@@ -64,7 +64,7 @@ inference fails, checks finite/non-silent 48 kHz stereo WAV output, records
 truncation, and keeps the source artifacts. This is not OS-wide network denial,
 an audio listening review, or a clean-machine packaging check.
 
-## C++ candidate build recipe (not yet executed)
+## C++ candidate build recipe (executed on Windows 2026-09-26)
 
 Use a detached checkout at the recorded C++ commit and its pinned GGML submodule;
 check both before building. Avoid a bare source archive inheriting Lagu's Git
@@ -89,6 +89,24 @@ setting; remove the reference-only `id`. Use `yue-synth --model ... --vae ...
 Compare intermediate BPE/AR/NAR/VAE results using upstream parity tools where
 compatible; float/quantized output is not expected to be byte-identical. Preserve
 the same decoder and distinguish any sampling/backend differences in the report.
+
+Windows commands used (from the repository root, after a detached clone at the
+pinned commit into `.phase0/yue2-cpp-git` with `git submodule update --init`, and
+`python -m venv .phase0/build-tools-venv` plus `pip install cmake ninja`):
+
+```powershell
+cmd /c tools\phase0\build-yue2-cpp.cmd
+./tools/phase0/prepare-models.ps1 -Profile yue2-cpp-q8
+& .phase0/reference-venv/Scripts/python.exe tools/phase0/run-cpp.py --request tools/phase0/requests/short.json --output .phase0/runs/short-cpp --repeat 2
+& .phase0/reference-venv/Scripts/python.exe tools/phase0/run-cpp.py --request tools/phase0/requests/full.json --output .phase0/runs/full-cpp
+```
+
+`run-cpp.py` verifies binary and model hashes, writes the converted request,
+runs each repeat as a new `yue-synth` process, samples process RSS and
+device-wide GPU memory, and applies the same WAV checks as the reference runner.
+For upstream's `tests/debug-nar-cossim.py`, the checkout needs `build/` (with an
+extensionless `yue-synth` hard link on Windows), `models/`, and `checkpoints/`
+hard-linked to verified files, plus `modeling_vae.py` from the installed package.
 
 ## Benchmark completion criteria
 

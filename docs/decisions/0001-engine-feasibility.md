@@ -17,6 +17,15 @@ fixture once. Use that
 backend for the Windows reference experiments; it does not select the production
 worker. See [measured results](../validation/phase0/README.md).
 
+First candidate evidence (Windows, RTX 4090): the pinned `yue2.cpp` builds
+unpatched with CUDA 13.3/MSVC 19.44 and completes the short and full fixtures
+without truncation, about 7-8x faster than the eager reference with roughly a
+quarter of the process RSS and under 6 GiB of GPU memory. Its Q8 acoustic stack
+tracks the float32 Python reference closely (decoded audio STFT cosine 0.99996).
+Listening, clean-machine loading, cancellation, and non-Windows targets remain
+open, so this strengthens the evaluation order without selecting the backend.
+The CUDA build needs cuBLAS/cuBLASLt (about 516 MB) beside the worker.
+
 The reference callback probes also expose integration gaps: an already-cancelled
 planning call loads the model before checking cancellation, and `decode()` has no
 cancellation parameter. Do not treat the Python pipeline alone as satisfying
@@ -85,7 +94,7 @@ Validate exact DLL/SO imports and their license terms before final packaging.
 
 ## Decisions still required to close Phase 0
 
-1. Complete native Windows and native Linux C++ builds and short/full-song runs.
+1. Complete native Linux C++ builds and short/full-song runs (Windows CUDA done).
 2. Compare official and candidate stages/outputs; conduct recorded listening.
 3. Obtain an Apple Silicon Mac and test Metal before choosing a Mac backend.
 4. Measure startup, memory, repeated jobs, cancellation/failures, and disk peaks.

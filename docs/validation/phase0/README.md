@@ -20,8 +20,11 @@ About 382.7 GB was free on the workspace volume at initial inspection. Windows
 has .NET SDK 10.0.401, Python 3.12.9, and CUDA toolkit directories 13.0/13.3.
 No CMake/Ninja/MSVC installation was found in PATH or standard Visual Studio
 locations. WSL did not expose CMake, Ninja, g++, nvcc, or uv through PATH.
-No system build tools were installed by this investigation. Finding toolkit
+No system build tools were installed during initial inspection. Finding toolkit
 folders alone does not verify a working compiler or a redistributable package.
+For the C++ candidate, the user approved installing VS 2022 Build Tools (C++
+workload, MSVC 14.44.35207, Windows SDK 10.0.26100) on 2026-09-26. CMake 4.4.3
+and Ninja 1.13.2 are pip packages in ignored `.phase0/build-tools-venv`, not PATH.
 
 ## Evidence ledger
 
@@ -37,8 +40,12 @@ folders alone does not verify a working compiler or a redistributable package.
 | Windows `torch-eager`, short fixture twice | Passed technical checks; listening pending | [Report](windows-short-eager.json): both runs complete, finite/non-silent 48 kHz stereo; no truncation; no Python network attempts |
 | Windows `torch-eager`, full fixture | Passed technical checks; listening pending | [Report](windows-full-eager.json): 166.119 s of audio in 262.795 s; no truncation or Python network attempts |
 | Windows upstream cancellation callbacks | Four interruption probes passed; limitations found | [Report](windows-cancellation.json): pre-cancel still loads model; small CUDA allocations persist after in-process close; decoder has no cancellation callback |
-| C++ CUDA/Metal compilation and inference | Not run | Build toolchains unavailable here; no Mac |
-| Official-vs-C++ stage parity/listening | Not run | Needs built candidate and outputs from both paths |
+| Windows C++ CUDA build (sm_89) | Passed | [Build record](windows-cpp-build.json): pinned commit/submodule, no patches, binary hashes and DLL imports; cuBLAS/cuBLASLt (516 MB) must be redistributed |
+| Windows C++ Q8, short fixture in two processes | Passed technical checks; listening pending | [Report](windows-short-cpp-q8.json): 66.359 s of audio in 14.35 s per process; identical WAV hashes across processes; no truncation |
+| Windows C++ Q8, full fixture | Passed technical checks; listening pending | [Report](windows-full-cpp-q8.json): 169.839 s of audio in 37.68 s; no truncation; 3 float samples exceed full scale (peak 1.072) |
+| Q8 acoustic-stage parity vs Python float32 | Passed (informational) | [Report](windows-q8-nar-cossim.json): upstream harness; final latent cosine 0.999888, decoded audio STFT cosine 0.999957 |
+| C++ Metal compilation and inference | Not run | No Mac |
+| AR (LM) logit parity and listening comparison | Not run | Upstream LM harness targets a BF16 GGUF outside the pinned profile; no listening review yet |
 | Standalone packaging | Not run | Current Python venv is a developer environment; no clean-machine package tested |
 
 The successful transfer recovery is not an app acceptance test. The research
@@ -87,6 +94,55 @@ ignored `.phase0/runs/windows-short-eager/` and `.phase0/runs/windows-full-eager
 They are retained for C++ comparisons and listening; no listening score has been
 assigned. These developer reference runs do not establish a packaged Windows
 backend or complete AC-016.
+
+## C++ CUDA candidate on Windows (2026-09-26)
+
+`yue-synth` was built from a detached checkout of the pinned yue2.cpp commit and
+GGML submodule with `GGML_NATIVE=OFF`, architecture 89, CUDA 13.3.73 and MSVC
+19.44. No source was patched. The embedded version is the upstream `f17d526`,
+not Alunan's commit. `tools/phase0/run-cpp.py` converted each fixture using the
+recorded recipe: same style, lyrics, `cot` and seed for both `lm_seed` and `seed`,
+32 steps, one song, `wav32`, 360 s budget. `yue-server` was never started.
+
+| Measurement (RTX 4090) | Python eager BF16 reference | C++ Q8_0 + F32 VAE |
+| --- | ---: | ---: |
+| Short: audio / generation time | 78.959 s / 113.857 s | 66.359 s / 14.35 s (whole process) |
+| Short: peak process RSS | 9.04 GiB | 2.29 GiB |
+| Short: peak GPU | 10.29 GiB reserved (PyTorch allocator) | 5.23 GiB device-wide above idle baseline |
+| Full: audio / generation time | 166.119 s / 262.795 s | 169.839 s / 37.68 s (whole process) |
+| Full: peak process RSS | 9.18 GiB | 2.36 GiB |
+| Full: peak GPU | 19.76 GiB reserved | 5.36 GiB device-wide above idle baseline |
+| Repeat determinism | Identical decoded samples in one process | Identical WAV hash across two processes |
+
+C++ times include process start, model load and WAV write; reference times
+exclude pipeline initialization, so the comparison slightly favors the
+reference. The GPU columns use different instruments (allocator vs
+`nvidia-smi` device-wide) and are indicative only. Q8 weights plus the F32 VAE
+are 4.34 GB against 7.79 GB for the reference profile. OS caches were not
+flushed. The engine loads one model half at a time (strict store policy).
+
+The engines sample differently, so the WAVs are different renditions of the same
+request and must be compared by listening, not by hash. The full C++ take has
+three float samples above 1.0 (peak 1.072) whereas the reference peaked at 1.0;
+a 16/24-bit export path must limit or clip explicitly. `yue-synth` reports
+per-stage truncation on stderr; neither stage was truncated.
+
+Upstream's `debug-nar-cossim.py` ran unmodified on CUDA with Q8_0, sharing the
+AR sequence and noise between GGML and the float32 Python reference built from
+the verified official checkpoint. Latent cosine stays above 0.99988 over 32
+steps; decoded audio STFT cosine is 0.999957, matching upstream's published
+Blackwell values to about 1e-5. This isolates prefill, flow matching and decoding;
+it does not validate AR sampling, which differs by design. The LM logit harness
+was not run because it needs a BF16 GGUF outside the pinned candidate profile.
+
+The first runner attempt failed before inference because it passed relative
+paths to a child running in another directory; that runner defect was fixed and
+its output kept as `.phase0/runs/windows-short-cpp-q8-relative-path-runner-bug`.
+
+These results do not select a production backend. Remaining for this candidate:
+blind listening against the reference, a clean-machine load test with colocated
+MSVC/OpenMP/cuBLAS DLLs and no toolkit, a multi-architecture CUDA build decision,
+cancellation/termination probes, and native Linux builds.
 
 ## Cancellation follow-up (2026-09-26)
 
@@ -139,8 +195,8 @@ OS-denied network test is required for release AC-003/AC-016.
 | Task | Progress | Required before completion |
 | --- | --- | --- |
 | P0-01 | Candidate targets and current host recorded | Obtain native Linux and Apple Silicon test access |
-| P0-02 | Source/model pins and Windows Python distribution hashes recorded | C++ build/toolchain closure, binary hashes, tested profiles for all targets |
-| P0-03 | Windows eager reference short/repeated/full technical runs passed; default backend failure preserved | Outputs on other targets; reference/candidate stage and listening comparisons |
+| P0-02 | Source/model pins, Windows Python distribution hashes, and Windows C++ CUDA build/binary hashes recorded | Build-tool lock, Linux/Mac builds, tested profiles for all targets |
+| P0-03 | Windows reference and C++ Q8 short/repeated/full technical runs passed; Q8 acoustic-stage parity recorded | Outputs on other targets; AR parity where applicable; listening comparisons |
 | P0-04 | Timing/memory/output/repeat reports and four callback interruption probes recorded | Measure external-stop/cleanup deadlines, cold caches/temp peaks and remaining failures; agree on quality and latency |
 | P0-05 | Metal-first evaluation order and MPS correctness issue documented | Real Mac Metal test, then measured alternatives only if necessary |
 | P0-06 | [Preliminary dependency/license inventory](dependencies.md); user selected Apache-2.0, applied in LICENSE | Tokenizer terms, approved distribution origins and exact bundled-component notices |
@@ -150,7 +206,8 @@ All Phase 0 checklist items remain open because each includes work beyond this
 initial evidence. Phase 1 remains unstarted. No unavailable target is waived and
 the three-native-platform/local-generation scope is unchanged.
 
-Next independent work: obtain/configure a C++ developer toolchain, build the
-pinned C++/GGML CUDA candidate, and compare it against these saved reference
-outputs. Then measure cancellation/failures and packaging closure. Native Linux
-and Apple Silicon hardware validation remain explicit open gates.
+Next independent work: a recorded blind listening comparison of the saved
+reference and C++ short/full takes (needs a human reviewer); a clean-machine
+load test of the C++ binaries with colocated runtime/cuBLAS DLLs; C++ process
+termination/cancellation probes; and a CUDA architecture-list decision. Native
+Linux and Apple Silicon hardware validation remain explicit open gates.
