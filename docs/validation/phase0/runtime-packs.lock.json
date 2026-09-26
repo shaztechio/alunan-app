@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Phase 0 research pins for vendor GPU runtime packs (FEATURES.md MOD-015); not the production catalog",
+  "source": {
+    "manifest": "https://developer.download.nvidia.com/compute/cuda/redist/redistrib_13.3.1.json",
+    "component": "libcublas",
+    "version": "13.6.0.2",
+    "license": "CUDA Toolkit (NVIDIA Software License Agreement and CUDA Supplement)"
+  },
+  "packs": [
+    {
+      "id": "cublas-13.6.0.2-win-x64",
+      "platform": "windows-x86_64",
+      "format": "zip",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcublas/windows-x86_64/libcublas-windows-x86_64-13.6.0.2-archive.zip",
+      "bytes": 393706755,
+      "sha256": "62e9fa30560c8f0a28e0cdcf9d6fc1fed347bcfab8847239b9ae1fdc1d86408a",
+      "files": [
+        {
+          "member": "libcublas-windows-x86_64-13.6.0.2-archive/bin/x64/cublas64_13.dll",
+          "name": "cublas64_13.dll",
+          "bytes": 52697712,
+          "sha256": "8c6bac24474af29627ec96500025a5d410a1b7e8ffa00e1fe13b1781fc6b3ddc"
+        },
+        {
+          "member": "libcublas-windows-x86_64-13.6.0.2-archive/bin/x64/cublasLt64_13.dll",
+          "name": "cublasLt64_13.dll",
+          "bytes": 463655536,
+          "sha256": "e323abd89e0f03c1db91a09d7aeb1928de08e1f86192cc713b335fefe3e368a9"
+        },
+        {
+          "member": "libcublas-windows-x86_64-13.6.0.2-archive/LICENSE",
+          "name": "LICENSE.txt",
+          "bytes": 68070,
+          "sha256": "088381bc2d891e719a2a9398645b00bb45f3b24231473a8283ac7e3e66b8a028"
+        }
+      ]
+    },
+    {
+      "id": "cublas-13.6.0.2-linux-x64",
+      "platform": "linux-x86_64",
+      "format": "tar.xz",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcublas/linux-x86_64/libcublas-linux-x86_64-13.6.0.2-archive.tar.xz",
+      "bytes": 817981368,
+      "sha256": "1794edb653adf48f5fa02d86bb738ed75888dd355aa39dadb6202d84d554c0dc",
+      "files": [
+        {
+          "memberPattern": "^libcublas-linux-x86_64-13\\.6\\.0\\.2-archive/lib/libcublas\\.so\\.13\\.[0-9.]+$",
+          "name": "libcublas.so.13",
+          "bytes": 55354008,
+          "sha256": "01dd70979e68625846e9a5edcba531d3798498b866aa1c925cc25d60f63fe680",
+          "observedMember": "libcublas-linux-x86_64-13.6.0.2-archive/lib/libcublas.so.13.6.0.2"
+        },
+        {
+          "memberPattern": "^libcublas-linux-x86_64-13\\.6\\.0\\.2-archive/lib/libcublasLt\\.so\\.13\\.[0-9.]+$",
+          "name": "libcublasLt.so.13",
+          "bytes": 516598272,
+          "sha256": "93c275af70b6d39fbd9b78cbc925ad9a9a0a81189aaec1521a951119ebe72da3",
+          "observedMember": "libcublas-linux-x86_64-13.6.0.2-archive/lib/libcublasLt.so.13.6.0.2"
+        },
+        {
+          "member": "libcublas-linux-x86_64-13.6.0.2-archive/LICENSE",
+          "name": "LICENSE.txt",
+          "bytes": 68070,
+          "sha256": "088381bc2d891e719a2a9398645b00bb45f3b24231473a8283ac7e3e66b8a028",
+          "observedMember": "libcublas-linux-x86_64-13.6.0.2-archive/LICENSE"
+        }
+      ],
+      "note": "Per-file digests pinned 2026-09-26 from a verified extraction on Windows (Python tarfile); symlinks in the archive were not extracted"
+    }
+  ]
+}

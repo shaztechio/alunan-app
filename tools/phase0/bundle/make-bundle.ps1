@@ -28,7 +28,7 @@ foreach ($name in 'msvcp140.dll', 'vcruntime140.dll', 'vcruntime140_1.dll') {
 Copy-Item (Join-Path $redist.FullName 'Microsoft.VC143.OpenMP\vcomp140.dll') $engine
 # Verified cuBLAS runtime pack (see docs/validation/phase0/windows-runtime-pack.json).
 $pack = Join-Path $phase0 'runtime-packs\cublas-13.6.0.2-win-x64'
-$expected = Get-Content -Raw (Join-Path $pack 'files.json') | ConvertFrom-Json
+$expected = (Get-Content -Raw (Join-Path $pack 'files.json') | ConvertFrom-Json).files
 foreach ($prop in $expected.PSObject.Properties) {
     $file = Join-Path $pack "files\$($prop.Name)"
     if ((Get-FileHash $file -Algorithm SHA256).Hash.ToLower() -ne $prop.Value.sha256) { throw "Runtime pack changed: $($prop.Name)" }

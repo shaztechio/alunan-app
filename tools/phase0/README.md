@@ -187,6 +187,26 @@ GGUFs and run the script there.
 ## Other platforms
 
 [`MACOS-RUNBOOK.md`](MACOS-RUNBOOK.md) is the step-by-step procedure for the
-Apple Silicon Mac evaluation. `prepare-models.py` is a cross-platform
+Apple Silicon Mac evaluation. [`LINUX-RUNBOOK.md`](LINUX-RUNBOOK.md) covers native
+Ubuntu 24.04 with NVIDIA CUDA (and a Linux RTX 5090 cloud container). `prepare-models.py` is a cross-platform
 equivalent of `prepare-models.ps1`, and `run-cpp.py` runs on macOS and Linux as
 well as Windows (engine name, library hashing, and memory sampling adapt).
+
+## Portable and cloud test kits
+
+`bundle/make-portable-kit.ps1` builds `.phase0/rtx30-kit/` (about 4.6 GB): the
+engine bundle, the two pinned GGUFs, and `RUN-TEST.cmd`, which verifies the
+models, runs the short and full songs, and leaves a `results` folder to send
+back. Copy the folder to another Windows PC with an NVIDIA driver and
+double-click `RUN-TEST.cmd`.
+
+`cloud/run-cloud-kit.sh` is the Linux cloud GPU equivalent (for example an RTX
+5090 pod); see [`cloud/README.md`](cloud/README.md). It builds on the pod and
+downloads its own verified inputs.
+
+`prepare-runtime-pack.py --pack <id>` downloads, verifies and allow-list
+extracts a vendor GPU runtime pack pinned in
+[`runtime-packs.lock.json`](../../docs/validation/phase0/runtime-packs.lock.json),
+writing `.phase0/runtime-packs/<id>/files/` and `files.json`.
+`probe-cpp-termination.py` accepts `--build`, `--request-json` and
+`--complete-take` so it runs against Linux builds too.
