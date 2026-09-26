@@ -6,6 +6,11 @@ the short fixture, waits for a stderr marker, calls TerminateProcess (via
 Popen.kill), and records: request-to-exit latency, time until device-wide GPU
 memory returns near its pre-run baseline, whether any compute process remains,
 and which output files were left behind. Run with the reference venv.
+
+--final-write instead waits for "[Store] Unload VAE" (decoding finished, outputs
+not yet written) and kills after a series of short delays, recording which
+output files exist, their sizes against a completed run, and whether a left
+WAV parses and how many frames it holds.
 """
 from __future__ import annotations
 
@@ -28,6 +33,10 @@ STAGES = [
     ("decode", "[VAE] Graph:"),
 ]
 TOLERANCE = 64 * 1024 * 1024
+FINAL_MARKER = "[Store] Unload VAE"
+FINAL_DELAYS_MS = [0, 1, 2, 5, 10, 20, 40, 80, 160]
+COMPLETE = ROOT / ".phase0/runs/windows-short-cpp-q8/take-1"
+OUTPUTS = ["tokens.csv", "latent.vae", "score.abc", "audio.wav", "audio.json"]
 
 
 def digest(path):
@@ -50,6 +59,8 @@ def compute_pids():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("report", type=Path)
+    parser.add_argument("--final-write", action="store_true")
+    parser.add_argument("--delays", help="comma-separated millisecond delays for --final-write")
     args = parser.parse_args()
     if args.report.exists():
         raise SystemExit("Refusing to overwrite an existing report")
@@ -68,6 +79,52 @@ def main():
               "requestSha256": digest(source), "method": "Popen.kill (TerminateProcess) on first stderr marker",
               "gpuScope": "device-wide nvidia-smi memory.used; released = within 64 MiB of the pre-run baseline",
               "probes": []}
+    if args.final_write:
+        import soundfile as sf
+        expected = {name: (COMPLETE / name).stat().st_size for name in OUTPUTS}
+        report["method"] = "Popen.kill after a fixed delay following the decoder-unload marker, before and during output writes"
+        report["expectedSizes"] = expected
+        report["trials"] = report.pop("probes")
+        delays = [int(d) for d in args.delays.split(",")] if args.delays else FINAL_DELAYS_MS
+        for delay in delays:
+            take = work / f"delay-{delay}ms"
+            take.mkdir()
+            command = [str(BUILD / "yue-synth.exe"), "--model", str(assets["YuE2-3B-Q8_0.gguf"]),
+                       "--vae", str(assets["YuE2-Vae-F32.gguf"]), "--request", str(source),
+                       "--out", str(take / "audio.wav"), "--score", str(take / "score.abc"),
+                       "--tokens", str(take / "tokens.csv"), "--latent", str(take / "latent.vae")]
+            child = subprocess.Popen(command, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, cwd=take,
+                                     text=True, encoding="utf-8", errors="replace", bufsize=1)
+            trial = {"delayMs": delay}
+            for line in child.stderr:
+                if FINAL_MARKER in line:
+                    time.sleep(delay / 1000)
+                    child.kill()
+                    break
+            child.wait()
+            trial["exitCode"] = child.returncode
+            trial["files"] = {}
+            for name in OUTPUTS:
+                path = take / name
+                if not path.exists():
+                    continue
+                info = {"bytes": path.stat().st_size, "complete": path.stat().st_size == expected[name]}
+                if name == "audio.wav":
+                    try:
+                        frames = sf.info(path).frames
+                        audio, _ = sf.read(path, always_2d=True)
+                        info["parses"] = True
+                        info["headerFrames"] = frames
+                        info["readableFrames"] = len(audio)
+                    except Exception as error:
+                        info["parses"] = False
+                        info["error"] = type(error).__name__
+                trial["files"][name] = info
+            report["trials"].append(trial)
+            print(json.dumps(trial), flush=True)
+        args.report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+        return 0
+
     for stage, marker in STAGES:
         take = work / stage
         take.mkdir()

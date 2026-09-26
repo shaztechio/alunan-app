@@ -29,7 +29,11 @@ The CUDA build needs cuBLAS/cuBLASLt (about 516 MB) beside the worker.
 Forced termination is a workable Stop mechanism for `yue-synth`: at every
 probed stage the process exited within 80 ms and released GPU memory within
 140 ms, with no partial outputs ([record](../validation/phase0/windows-cpp-termination.json)).
-The worker must still stage final outputs under temporary names. A
+A kill during the final write can leave a truncated WAV that parses and plays
+([record](../validation/phase0/windows-cpp-final-write.json)), so the worker must
+stage outputs under temporary names and report success only by explicit message.
+Five repeated full-song processes showed no drift in time or memory
+([record](../validation/phase0/windows-full-cpp-q8-repeat5.json)). A
 multi-architecture CUDA build costs about 52 MB and 509 s of build time; ggml's
 `120a` rewrite means its PTX is not a forward-compatible fallback
 ([record](../validation/phase0/windows-cpp-multiarch.json)). Supported GPUs
