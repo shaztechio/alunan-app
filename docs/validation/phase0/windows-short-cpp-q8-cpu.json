@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-technical-checks-listening-pending",
+  "observedAt": "2026-09-26",
+  "engine": "yue2.cpp f17d526 (2026-09-24)",
+  "binaries": {
+    "yue-synth.exe": "d933ce730decc293f1c348cf4744860a57aa3d7d12aaa1a3924990f5e17c1709",
+    "ggml.dll": "1fc74276a4b1203216f46a681d4c4e91757a66c1745a9c18f361d910dd492fd3",
+    "ggml-base.dll": "43eff0f713e7f7725c7a1d0af830eca34d31362587858e9c39e26f54e8b35f17",
+    "ggml-cpu.dll": "20fc415e2c6025ec401d45275827340612aaffd8657afd0b94508a2f2539c214",
+    "ggml-cuda.dll": "76d2a96dfca62a45dcc3a4264a1e04ce00ab32b2c8db584040de5ded5d0ad078"
+  },
+  "fixture": "tools/phase0/requests/short.json",
+  "effectiveRequest": {
+    "style": "English, acoustic folk pop, warm clear lead vocal, acoustic guitar, soft drums, 90 BPM",
+    "lyrics": "[Verse]\nMorning light across the floor\nI leave my worries at the door\n\n[Chorus]\nOne small song to start the day\nLet the music lead the way\n[End]",
+    "cot": "full",
+    "lm_seed": 831001,
+    "seed": 831001,
+    "steps": 32,
+    "lm_batch_size": 1,
+    "synth_batch_size": 1,
+    "duration": 360.0,
+    "output_format": "wav32"
+  },
+  "backend": "CPU forced with GGML_BACKEND=CPU (the engine also falls back to CPU automatically when no GPU backend initializes)",
+  "cpu": "AMD Ryzen 9 7950X, 16 cores / 32 threads; engine used 16 threads",
+  "processSeconds": 950.5956871999952,
+  "audioSeconds": 67.15866666666666,
+  "peakRssBytes": 5882761216,
+  "truncated": false,
+  "finiteNonSilentAudio": true,
+  "peakAbs": 0.9929606914520264,
+  "wavSha256": "77bfea5afa027a87a2a4d18596eb5b4d66fd49f23b807a7bf74d44b91e3f14ce",
+  "stageLog": [
+    "[Load] KV backend: CPU (CPU threads: 16)",
+    "[Load] LM backend: CPU (CPU threads: 16)",
+    "[AR] Score: 673 tokens over 1 songs, 674 steps, 55.4 s (82.2 ms/step)",
+    "[AR] Semantic: 1679 tokens over 1 songs, 1680 steps, 139.2 s (82.9 ms/step)",
+    "[Load] NAR backend: CPU (CPU threads: 16)",
+    "[NAR] Solved: T_lat=1679, 1 variations, 32 steps, 728540 ms (22766.9 ms/step)",
+    "[Load] VAE backend: CPU (CPU threads: 16)",
+    "[VAE] Tiled decode done: 4 tiles -> T_audio=3223616 (67.16s @ 48kHz), 23718 ms",
+    "[Pipeline] Done: 1 tracks, 67.2 s of audio in 950.0 s (0.1x realtime)"
+  ],
+  "comparisonRtx4090": {
+    "processSeconds": 14.35,
+    "scoreSeconds": 2.7,
+    "semanticSeconds": 5.2,
+    "acousticSeconds": 3.1,
+    "decodeSeconds": 0.4
+  },
+  "findings": [
+    "CPU-only generation completes: 67.2 s of audio in 950 s (about 16 minutes), about 66x slower than the RTX 4090",
+    "Flow matching dominates on CPU: 729 s for 32 steps (22.8 s per step) versus 3.1 s on the GPU; score and semantic generation run at about 82 ms per token",
+    "Peak process memory rises to 5.9 GB because weights and activations live in system RAM",
+    "The CPU backend produced 1679 semantic tokens versus 1659 on CUDA from the same seed, so it is a different rendition",
+    "A full-length song (about 170 s) would extrapolate to roughly 40 minutes or more on this CPU; not measured"
+  ],
+  "limitations": [
+    "One CPU; the bundle smoke test ran on the GPU during part of this run, so device GPU numbers are not meaningful and are omitted",
+    "Not listened to"
+  ]
+}

@@ -429,7 +429,7 @@ than using unverified download sizes, memory figures, or calendar estimates.
 | Decision | Resolve by | Basis |
 | --- | --- | --- |
 | Engine/backend and redistributable dependency set | End of phase 0 | Complete measured generation and bundled-runtime feasibility on each target. |
-| Vendor GPU runtime pack terms and pins | End of phase 0 | Confirm NVIDIA terms permit end-user download of the pinned redistributable archive by the app, the notices to show, and the archive/file pins per platform. |
+| Vendor GPU runtime pack terms and pins | End of phase 0 | Terms: decided 2026-09-26 by the project owner's reading (no download gate observed); show the archive's NVIDIA license. Windows pins verified; Linux pins still needed. |
 | Approved model distribution terms | End of phase 0 | Apache-2.0 source license selected and applied; exact selected components/weights still need distribution review. |
 | Candidate OS/architecture/GPU profiles and GTK baseline | End of phase 0; confirm in 6 | Actual compatibility, memory, quality, and latency evidence. |
 | Model revisions, origin, full asset set, hashes | End of phase 0; verify in 7 | Immutable files and approved distribution; no invented Lagu mirror. |

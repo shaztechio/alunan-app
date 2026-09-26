@@ -167,3 +167,19 @@ Reported exception latency is relative to the synthetic flag, not an arbitrary
 external UI cancellation. CUDA allocator values after `close()`/collection are
 recorded without claiming zero driver overhead or a proven leak. Model-load,
 decoder, external process termination and cleanup deadlines require separate tests.
+
+## Portable engine test bundle
+
+`bundle/make-bundle.ps1` assembles `.phase0/test-bundle/` from the
+multi-architecture build: `yue-synth` and the ggml DLLs with app-local Visual
+C++ and OpenMP runtime DLLs, the verified cuBLAS pack in `runtime/cublas`, the
+converted short/full requests, and `run-test.ps1`. It also writes
+`.phase0/alunan-engine-test.wsb` for Windows Sandbox (networking and vGPU off,
+bundle and models mapped read-only, `.phase0/sandbox-results` writable).
+
+`run-test.ps1 -Bundle <dir> -Models <dir> -Results <dir> [-Fixture full]` records
+the OS, whether the C++ runtime exists in System32, a negative control run of
+the engine without its app-local runtime DLLs, a load check, one generation, and
+every DLL the process maps. In the sandbox there is no CUDA device, so the
+engine falls back to the CPU. On another NVIDIA PC, copy the bundle and the two
+GGUFs and run the script there.

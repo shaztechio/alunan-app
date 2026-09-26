@@ -53,6 +53,7 @@ and Ninja 1.13.2 are pip packages in ignored `.phase0/build-tools-venv`, not PAT
 | C++ repeated full jobs (5 processes) | Passed | [Record](windows-full-cpp-q8-repeat5.json): 37.4-38.3 s each, identical WAVs, flat RSS/GPU peaks, same idle GPU baseline before every job |
 | C++ cold vs warm start | Measured | [Record](windows-cpp-cold-start.json): uncached models add about 2 s to a 14 s short job on NVMe; no temporary files; writes equal outputs |
 | C++ bad model files and scarce VRAM | Measured; two app requirements found | [Record](windows-cpp-failures.json): missing/truncated/bad-header/wrong files fail fast; missing decoder fails after generation; same-size decoder corruption exits 0 with silent audio; low free VRAM slowed rather than failed under WDDM; true OOM not reproduced |
+| C++ CPU-only fallback, short fixture | Completes; too slow for a default | [Record](windows-short-cpp-q8-cpu.json): 67 s of audio in 950 s on a Ryzen 9 7950X (about 66x slower than the RTX 4090); 5.9 GB peak RSS; different rendition from CUDA |
 | C++ multi-architecture CUDA build | Built; RTX 4090 only exercised | [Record](windows-cpp-multiarch.json): sm_75/86/89/120a + compute_120a; ggml-cuda.dll 103.7 MB vs 51.6 MB; identical WAV on the 4090; other architectures untested |
 | Standalone packaging | Not run | Current Python venv is a developer environment; no clean-machine package tested |
 
@@ -169,7 +170,8 @@ searched first, so the Phase 3 worker must set its DLL search directories itself
 The archive's bundled NVIDIA license lists the CUDA BLAS library as
 distributable with applications and requires that distributable portions be
 accessed only by the application. Whether an app-initiated end-user download
-from NVIDIA fits that grant is recorded as an open review question, not decided.
+from NVIDIA fits that grant was then decided by the project owner's own reading
+(2026-09-26): proceed, showing NVIDIA's license. No download gate was observed.
 
 **Forced termination.** `yue-synth` has no cancellation channel. Killing it with
 `TerminateProcess` after model load started, during score and semantic
@@ -210,6 +212,13 @@ the app must rely on its own hash verification, and silent output must be
 rejected. Holding VRAM in another process so that only 3.3 GB remained did not
 make the engine fail: under WDDM it finished about 13% slower. A real CUDA
 out-of-memory failure still needs a smaller GPU to reproduce.
+
+**CPU fallback.** The engine falls back to the CPU when no GPU backend starts.
+Forced onto a Ryzen 9 7950X, the short song took 950 s (about 16 minutes) for
+67 s of audio, about 66 times slower than the RTX 4090, mostly in flow matching
+(22.8 s per step). Peak process memory was 5.9 GB. It works, but FEATURES.md
+does not promise CPU support, and advertising it would need a spec decision and
+measured minimums first.
 
 **Listening review.** `tools/phase0/make-listening-kit.py` wrote blind A/B pairs
 of the retained short and full takes through one WAV writer with equal
@@ -289,7 +298,6 @@ Next work, by what it needs:
 
 - A human reviewer, later: more takes and reviewers once other targets produce
   audio; the first Windows review is recorded.
-- A licensing decision: NVIDIA's terms for app-initiated cuBLAS downloads.
 - Other hardware: a clean Windows machine without the VC++ redistributable;
   Turing/Ampere/Blackwell GPUs for architecture coverage; native Linux; Apple
   Silicon for Metal. None of these can be counted as passing until run.
