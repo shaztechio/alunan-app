@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "platform": "Windows-11-10.0.26200-SP0",
+  "binary": "d933ce730decc293f1c348cf4744860a57aa3d7d12aaa1a3924990f5e17c1709",
+  "requestSha256": "7da099e44b1f805dab030a7d7ec28baac11d5aeff9f0a7324943c3840019cf4b",
+  "cases": [
+    {
+      "case": "missing-generator",
+      "exitCode": 1,
+      "seconds": 0.11278630001470447,
+      "lastLines": [
+        "[Request] Parsed <repo>\\.phase0\\runs\\windows-short-cpp-q8\\request.json",
+        "[Store] Created (policy=STRICT)",
+        "gguf_init_from_file: failed to open GGUF file '<repo>\\.phase0\\failure-scratch\\absent.gguf' (No such file or directory)",
+        "[BPE] Failed to open <repo>\\.phase0\\failure-scratch\\absent.gguf"
+      ],
+      "errorLines": [
+        "gguf_init_from_file: failed to open GGUF file '<repo>\\.phase0\\failure-scratch\\absent.gguf' (No such file or directory)"
+      ],
+      "outputs": {}
+    },
+    {
+      "case": "missing-decoder",
+      "exitCode": 1,
+      "seconds": 13.12604899998405,
+      "lastLines": [
+        "[NAR] Song 0 chunk 1/1: 1659 frames, cache 2425 rows, 0 forwarded, 3.8 s",
+        "[Store] Unload NAR (1433.5 MB)",
+        "[GGUF] Cannot open <repo>\\.phase0\\failure-scratch\\absent-vae.gguf",
+        "[VAE] FATAL: cannot load <repo>\\.phase0\\failure-scratch\\absent-vae.gguf"
+      ],
+      "errorLines": [
+        "[VAE] FATAL: cannot load <repo>\\.phase0\\failure-scratch\\absent-vae.gguf"
+      ],
+      "outputs": {}
+    },
+    {
+      "case": "truncated-generator",
+      "exitCode": 1,
+      "seconds": 0.25094759999774396,
+      "lastLines": [
+        "[GGUF] FATAL: '<repo>\\.phase0\\failure-scratch\\truncated-Q8.gguf' is truncated or corrupt",
+        "[GGUF] FATAL: tensor 'model.layers.18.mlp.gate_proj.weight' needs bytes [1892611840..1905981184) but file is only 1905116032 bytes",
+        "[GGUF] FATAL: re-download the file and verify its size or checksum",
+        "[LM-Load] FATAL: cannot load <repo>\\.phase0\\failure-scratch\\truncated-Q8.gguf"
+      ],
+      "errorLines": [
+        "[GGUF] FATAL: '<repo>\\.phase0\\failure-scratch\\truncated-Q8.gguf' is truncated or corrupt",
+        "[GGUF] FATAL: tensor 'model.layers.18.mlp.gate_proj.weight' needs bytes [1892611840..1905981184) but file is only 1905116032 bytes",
+        "[GGUF] FATAL: re-download the file and verify its size or checksum",
+        "[LM-Load] FATAL: cannot load <repo>\\.phase0\\failure-scratch\\truncated-Q8.gguf"
+      ],
+      "outputs": {}
+    },
+    {
+      "case": "bad-header-generator",
+      "exitCode": 1,
+      "seconds": 0.09185309999156743,
+      "lastLines": [
+        "[Request] Parsed <repo>\\.phase0\\runs\\windows-short-cpp-q8\\request.json",
+        "[Store] Created (policy=STRICT)",
+        "gguf_init_from_reader: invalid magic characters: 'XXXX', expected 'GGUF'",
+        "[BPE] Failed to open <repo>\\.phase0\\failure-scratch\\bad-header-Q8.gguf"
+      ],
+      "errorLines": [],
+      "outputs": {}
+    },
+    {
+      "case": "decoder-as-generator",
+      "exitCode": 1,
+      "seconds": 0.0893699000007473,
+      "lastLines": [
+        "[Request] Parsed <repo>\\.phase0\\runs\\windows-short-cpp-q8\\request.json",
+        "[Store] Created (policy=STRICT)",
+        "[BPE] Tokenizer not found in <repo>\\.phase0\\models\\Serveurperso\\YuE2-GGUF\\64b030e3deb6e8150d2b7c0db641ef5a17eca8a3\\YuE2-Vae-F32.gguf"
+      ],
+      "errorLines": [],
+      "outputs": {}
+    },
+    {
+      "case": "same-size-corrupt-decoder",
+      "exitCode": 0,
+      "seconds": 13.979873400006909,
+      "lastLines": [
+        "[Pipeline] Done: 1 tracks, 66.4 s of audio in 13.6 s (4.9x realtime)",
+        "[Store] Unload VAE (126.7 MB)",
+        "[WAV] Wrote <repo>\\.phase0\\runs\\windows-cpp-failures\\same-size-corrupt-decoder\\audio.wav: 3185216 samples, 48000 Hz, stereo",
+        "[Synth] Done: 66.4 s of audio, seeds 831001 and 831001 -> <repo>\\.phase0\\runs\\windows-cpp-failures\\same-size-corrupt-decoder\\audio.wav"
+      ],
+      "errorLines": [],
+      "outputs": {
+        "audio.json": 10634,
+        "audio.wav": 25481772
+      },
+      "wav": {
+        "finite": true,
+        "peakAbs": 0.0,
+        "seconds": 66.35866666666666
+      }
+    },
+    {
+      "case": "vram-free-3072MiB",
+      "exitCode": 0,
+      "seconds": 16.20476970000891,
+      "lastLines": [
+        "[Pipeline] Done: 1 tracks, 66.4 s of audio in 15.8 s (4.2x realtime)",
+        "[Store] Unload VAE (126.7 MB)",
+        "[WAV] Wrote <repo>\\.phase0\\runs\\windows-cpp-failures\\vram-free-3072MiB\\audio.wav: 3185216 samples, 48000 Hz, stereo",
+        "[Synth] Done: 66.4 s of audio, seeds 831001 and 831001 -> <repo>\\.phase0\\runs\\windows-cpp-failures\\vram-free-3072MiB\\audio.wav"
+      ],
+      "errorLines": [],
+      "outputs": {
+        "audio.json": 10634,
+        "audio.wav": 25481772
+      },
+      "wav": {
+        "finite": true,
+        "peakAbs": 0.97216796875,
+        "seconds": 66.35866666666666
+      },
+      "freeVramBytesAtStart": 3485466624
+    },
+    {
+      "case": "vram-free-6144MiB",
+      "exitCode": 0,
+      "seconds": 14.86384239999461,
+      "lastLines": [
+        "[Pipeline] Done: 1 tracks, 66.4 s of audio in 14.5 s (4.6x realtime)",
+        "[Store] Unload VAE (126.7 MB)",
+        "[WAV] Wrote <repo>\\.phase0\\runs\\windows-cpp-failures\\vram-free-6144MiB\\audio.wav: 3185216 samples, 48000 Hz, stereo",
+        "[Synth] Done: 66.4 s of audio, seeds 831001 and 831001 -> <repo>\\.phase0\\runs\\windows-cpp-failures\\vram-free-6144MiB\\audio.wav"
+      ],
+      "errorLines": [],
+      "outputs": {
+        "audio.json": 10634,
+        "audio.wav": 25481772
+      },
+      "wav": {
+        "finite": true,
+        "peakAbs": 0.97216796875,
+        "seconds": 66.35866666666666
+      },
+      "freeVramBytesAtStart": 6706692096
+    }
+  ],
+  "scratch": {
+    "truncatedBytes": 1905116032,
+    "corruptVaeSameSize": true,
+    "corruptVaeSha256": "aac3aaad187a316b5df18fc010cc60ec692c02deb8043286796c796a5409fdf9"
+  },
+  "status": "measured",
+  "observedAt": "2026-09-26",
+  "fixture": "tools/phase0/requests/short.json",
+  "gpuMeasurementNote": "Device-wide post-run GPU deltas were dropped: with a helper holding memory under WDDM paging they were not meaningful",
+  "findings": [
+    "Missing generator, truncated generator, corrupted header, and decoder-passed-as-generator each fail in under 0.25 s with exit code 1 and a clear message; the truncated case names the tensor and recommends re-downloading",
+    "A missing decoder is only detected after about 13 s of generation, because the decoder loads last: the worker must check every required file before launch",
+    "Same-size corruption inside the decoder's tensor data exits 0 and writes a complete, finite, entirely silent WAV (peak 0.0): the engine does not detect corrupt weights, so MOD-005/006 hash verification is essential and the app should also reject silent output",
+    "With a helper holding VRAM so that only 3.3 GB or 6.4 GB was free (below the ~5.6 GB peak for the first), generation still succeeded, taking 15.8 s of pipeline time vs 14.0 s. Under WDDM the driver can page idle allocations and fall back to system memory, so scarce VRAM appeared as a slowdown, not an error",
+    "A genuine CUDA out-of-memory failure was not reproduced here; it needs a GPU with less VRAM or an actively competing workload"
+  ]
+}

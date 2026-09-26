@@ -51,6 +51,8 @@ and Ninja 1.13.2 are pip packages in ignored `.phase0/build-tools-venv`, not PAT
 | C++ forced termination per stage | Passed | [Record](windows-cpp-termination.json): exit within 80 ms and device GPU memory back to baseline within 140 ms at load/score/semantic/acoustic/decode; no leftover files; final write phase not probed |
 | C++ kill during final write | Failure mode confirmed | [Record](windows-cpp-final-write.json): a kill mid-write left a WAV 556 bytes short that still parses and plays; kills after writing exit 1 with complete files. Worker must stage and promote outputs |
 | C++ repeated full jobs (5 processes) | Passed | [Record](windows-full-cpp-q8-repeat5.json): 37.4-38.3 s each, identical WAVs, flat RSS/GPU peaks, same idle GPU baseline before every job |
+| C++ cold vs warm start | Measured | [Record](windows-cpp-cold-start.json): uncached models add about 2 s to a 14 s short job on NVMe; no temporary files; writes equal outputs |
+| C++ bad model files and scarce VRAM | Measured; two app requirements found | [Record](windows-cpp-failures.json): missing/truncated/bad-header/wrong files fail fast; missing decoder fails after generation; same-size decoder corruption exits 0 with silent audio; low free VRAM slowed rather than failed under WDDM; true OOM not reproduced |
 | C++ multi-architecture CUDA build | Built; RTX 4090 only exercised | [Record](windows-cpp-multiarch.json): sm_75/86/89/120a + compute_120a; ggml-cuda.dll 103.7 MB vs 51.6 MB; identical WAV on the 4090; other architectures untested |
 | Standalone packaging | Not run | Current Python venv is a developer environment; no clean-machine package tested |
 
@@ -197,6 +199,18 @@ full-song processes then ran in 37.4-38.3 s each with identical WAVs, flat memor
 peaks, and the same idle GPU baseline before each job. A long-lived worker that
 keeps models loaded between jobs has not been tested.
 
+**Cold start, bad files, and scarce VRAM.** Model copies made with unbuffered
+I/O (outside the file cache) added about 2 s to a 14 s short job on this NVMe
+drive; the engine created no temporary files and wrote only its outputs.
+Missing, truncated, corrupted-header, and wrong model files fail within 0.25 s
+with clear messages, but a missing decoder is found only after about 13 s of
+generation, and same-size corruption inside decoder weights exits successfully
+with a completely silent WAV. The worker must check all files before launch,
+the app must rely on its own hash verification, and silent output must be
+rejected. Holding VRAM in another process so that only 3.3 GB remained did not
+make the engine fail: under WDDM it finished about 13% slower. A real CUDA
+out-of-memory failure still needs a smaller GPU to reproduce.
+
 **Listening review.** `tools/phase0/make-listening-kit.py` wrote blind A/B pairs
 of the retained short and full takes through one WAV writer with equal
 timestamps, a scoring sheet, and a separate key. The project owner listened on
@@ -262,7 +276,7 @@ OS-denied network test is required for release AC-003/AC-016.
 | P0-01 | Candidate targets and current host recorded | Obtain native Linux and Apple Silicon test access |
 | P0-02 | Source/model pins, Windows Python distribution hashes, and Windows C++ CUDA build/binary hashes recorded | Build-tool lock, Linux/Mac builds, tested profiles for all targets |
 | P0-03 | Windows reference and C++ Q8 short/repeated/full technical runs passed; Q8 acoustic-stage parity and a first blind listening review recorded | Outputs on other targets; AR parity where applicable; broader listening (more takes/reviewers) and other targets |
-| P0-04 | Timing/memory/output/repeat reports, reference callback probes, C++ per-stage and final-write termination, and five repeated C++ full jobs recorded | Cold caches/temp peaks, out-of-memory and missing/corrupt asset failures; agree on quality and latency |
+| P0-04 | Timing/memory/output/repeat reports, reference callback probes, C++ termination (per stage and final write), repeated jobs, cold start/temp disk, and bad-asset/scarce-VRAM failures recorded | True out-of-memory on a smaller GPU, slower-disk cold starts, other targets; agree on quality and latency |
 | P0-05 | Metal-first evaluation order and MPS correctness issue documented | Real Mac Metal test, then measured alternatives only if necessary |
 | P0-06 | [Preliminary dependency/license inventory](dependencies.md); user selected Apache-2.0, applied in LICENSE; cuBLAS pack pinned and verified | Tokenizer terms, NVIDIA end-user download review, approved distribution origins and exact bundled-component notices |
 | P0-07 | .NET 10, Gir.Core 0.8.1 and candidate OS/package baselines recorded | Validate GTK closure/API floor, Mac SDK, and clean-machine packaging path |
@@ -279,7 +293,5 @@ Next work, by what it needs:
 - Other hardware: a clean Windows machine without the VC++ redistributable;
   Turing/Ampere/Blackwell GPUs for architecture coverage; native Linux; Apple
   Silicon for Metal. None of these can be counted as passing until run.
-- Here, independently: cold-cache startup and peak temporary disk, and the
-  engine's behavior with missing or corrupt model files and out-of-memory
-  conditions. Native Linux and Apple Silicon hardware validation remain
-  explicit open gates.
+- Here: the Windows C++ feasibility checks this machine can run are done.
+  Native Linux and Apple Silicon hardware validation remain explicit open gates.

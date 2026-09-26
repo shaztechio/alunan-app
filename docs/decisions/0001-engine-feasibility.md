@@ -32,6 +32,11 @@ probed stage the process exited within 80 ms and released GPU memory within
 A kill during the final write can leave a truncated WAV that parses and plays
 ([record](../validation/phase0/windows-cpp-final-write.json)), so the worker must
 stage outputs under temporary names and report success only by explicit message.
+Same-size corruption in decoder weights makes `yue-synth` exit successfully
+with silent audio, and a missing decoder is found only after generation
+([record](../validation/phase0/windows-cpp-failures.json)): the app's own hash
+verification and a pre-launch file check are required, and silent output must
+be rejected. Under WDDM, scarce VRAM slowed generation instead of failing.
 Five repeated full-song processes showed no drift in time or memory
 ([record](../validation/phase0/windows-full-cpp-q8-repeat5.json)). A
 multi-architecture CUDA build costs about 52 MB and 509 s of build time; ggml's

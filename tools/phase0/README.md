@@ -122,6 +122,13 @@ With `--final-write [--delays 44,48,...]` it instead kills at delays after the
 decoder unloads and records which outputs exist, their sizes, and whether a
 partial WAV parses.
 
+`probe-cpp-cold-start.py <new-report.json>` copies the pinned GGUFs with
+unbuffered I/O, runs a cold and a warm short job, and records stage load times,
+process I/O, and new TEMP files. `probe-cpp-failures.py <new-report.json>` runs
+missing, truncated, corrupted, and wrong model files from scratch copies, then
+the short job with a helper holding VRAM (`--keep-free-mib`). Both delete their
+scratch copies.
+
 `make-listening-kit.py` writes a blind A/B kit of the retained reference and C++
 takes to `.phase0/listening/kit-1` with a scoring sheet and a separate key.
 
