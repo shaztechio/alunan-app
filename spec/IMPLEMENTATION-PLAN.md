@@ -148,7 +148,8 @@ environment are pinned; fixed requests and a local benchmark runner are present.
 Windows eager-reference short/repeated/full runs passed technical checks; the
 default backend's flash-attention failure is recorded. The pinned C++ Q8 CUDA
 candidate built and passed the same Windows technical checks, with acoustic-stage
-parity recorded. Listening comparisons remain open. WSL is an auxiliary Linux
+parity recorded. A first blind listening review preferred the C++ takes; broader
+listening remains open. WSL is an auxiliary Linux
 environment, not native Linux qualification. The user confirmed no Mac is
 currently available. All P0 checkboxes stay open until their full cross-platform
 deliverables are satisfied; see the [evidence ledger](../docs/validation/phase0/README.md).

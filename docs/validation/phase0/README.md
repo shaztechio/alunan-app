@@ -45,7 +45,8 @@ and Ninja 1.13.2 are pip packages in ignored `.phase0/build-tools-venv`, not PAT
 | Windows C++ Q8, full fixture | Passed technical checks; listening pending | [Report](windows-full-cpp-q8.json): 169.839 s of audio in 37.68 s; no truncation; 3 float samples exceed full scale (peak 1.072) |
 | Q8 acoustic-stage parity vs Python float32 | Passed (informational) | [Report](windows-q8-nar-cossim.json): upstream harness; final latent cosine 0.999888, decoded audio STFT cosine 0.999957 |
 | C++ Metal compilation and inference | Not run | No Mac |
-| AR (LM) logit parity and listening comparison | Not run | Upstream LM harness targets a BF16 GGUF outside the pinned profile. A blind A/B kit is prepared locally; no review recorded yet |
+| AR (LM) logit parity | Not run | Upstream LM harness targets a BF16 GGUF outside the pinned profile |
+| Blind listening, reference vs C++ Q8 (Windows) | Recorded; one reviewer | [Review](windows-listening-review-1.json): all four takes pass overall; C++ candidate preferred for short and full; one distorted take per engine; small sample with listed blinding limits |
 | Pinned NVIDIA cuBLAS runtime pack (Windows) | Passed | [Record](windows-runtime-pack.json): archive matched pinned size/SHA-256; allow-listed DLLs identical to the tested toolkit copies and NVIDIA-signed; short fixture with no toolkit on PATH loaded cuBLAS only from the pack and reproduced the WAV hash |
 | C++ forced termination per stage | Passed | [Record](windows-cpp-termination.json): exit within 80 ms and device GPU memory back to baseline within 140 ms at load/score/semantic/acoustic/decode; no leftover files; final write phase not probed |
 | C++ multi-architecture CUDA build | Built; RTX 4090 only exercised | [Record](windows-cpp-multiarch.json): sm_75/86/89/120a + compute_120a; ggml-cuda.dll 103.7 MB vs 51.6 MB; identical WAV on the 4090; other architectures untested |
@@ -182,10 +183,17 @@ fallback for later GPU generations. Turing, Ampere and Blackwell code was
 compiled but never executed here. The supported-GPU list must come from
 measurements on those GPUs, not from the build list.
 
-**Listening kit.** `tools/phase0/make-listening-kit.py` writes blind A/B pairs of
-the retained short and full takes, rewritten through one WAV writer with equal
-timestamps, a scoring sheet, and a separate key. Durations still differ between
-engines. No review has been recorded.
+**Listening review.** `tools/phase0/make-listening-kit.py` wrote blind A/B pairs
+of the retained short and full takes through one WAV writer with equal
+timestamps, a scoring sheet, and a separate key. The project owner listened on
+speakers and rated all four takes pass overall, preferring the C++ Q8 candidate
+for both fixtures. Audible distortion was reported in the reference short take,
+which has no near-full-scale samples, and in the C++ full take, whose three
+over-full-scale samples near 141 s and 144 s are unlikely to explain it alone.
+This is one reviewer and one take per engine; engine and A/B position were
+confounded by the random draw, durations differ, and a question asked with the
+preferences mentioned the C++ overs. It supports keeping the candidate, not a
+final quality bar.
 
 ## Cancellation follow-up (2026-09-26)
 
@@ -239,7 +247,7 @@ OS-denied network test is required for release AC-003/AC-016.
 | --- | --- | --- |
 | P0-01 | Candidate targets and current host recorded | Obtain native Linux and Apple Silicon test access |
 | P0-02 | Source/model pins, Windows Python distribution hashes, and Windows C++ CUDA build/binary hashes recorded | Build-tool lock, Linux/Mac builds, tested profiles for all targets |
-| P0-03 | Windows reference and C++ Q8 short/repeated/full technical runs passed; Q8 acoustic-stage parity recorded | Outputs on other targets; AR parity where applicable; listening comparisons |
+| P0-03 | Windows reference and C++ Q8 short/repeated/full technical runs passed; Q8 acoustic-stage parity and a first blind listening review recorded | Outputs on other targets; AR parity where applicable; broader listening (more takes/reviewers) and other targets |
 | P0-04 | Timing/memory/output/repeat reports, four reference callback probes, and C++ per-stage forced-termination/GPU-release timing recorded | Final-write interruption, cold caches/temp peaks and remaining failures; agree on quality and latency |
 | P0-05 | Metal-first evaluation order and MPS correctness issue documented | Real Mac Metal test, then measured alternatives only if necessary |
 | P0-06 | [Preliminary dependency/license inventory](dependencies.md); user selected Apache-2.0, applied in LICENSE; cuBLAS pack pinned and verified | Tokenizer terms, NVIDIA end-user download review, approved distribution origins and exact bundled-component notices |
@@ -251,7 +259,8 @@ the three-native-platform/local-generation scope is unchanged.
 
 Next work, by what it needs:
 
-- A human reviewer: score the blind listening kit and record the result.
+- A human reviewer, later: more takes and reviewers once other targets produce
+  audio; the first Windows review is recorded.
 - A licensing decision: NVIDIA's terms for app-initiated cuBLAS downloads.
 - Other hardware: a clean Windows machine without the VC++ redistributable;
   Turing/Ampere/Blackwell GPUs for architecture coverage; native Linux; Apple

@@ -35,6 +35,11 @@ multi-architecture CUDA build costs about 52 MB and 509 s of build time; ggml's
 ([record](../validation/phase0/windows-cpp-multiarch.json)). Supported GPUs
 will follow measurements on those GPUs.
 
+A first blind listening review (one reviewer, speakers) rated both engines'
+short and full takes pass and preferred the C++ Q8 take for both fixtures
+([review](../validation/phase0/windows-listening-review-1.json)). With its
+limits, it removes quality as a reason to prefer the Python reference on Windows.
+
 The reference callback probes also expose integration gaps: an already-cancelled
 planning call loads the model before checking cancellation, and `decode()` has no
 cancellation parameter. Do not treat the Python pipeline alone as satisfying
