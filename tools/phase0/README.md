@@ -118,6 +118,9 @@ full-path loading MOD-015 requires of the app.
 
 `probe-cpp-termination.py <new-report.json>` kills `yue-synth` at five stage
 markers and records exit latency, device GPU release, and leftover files.
+With `--final-write [--delays 44,48,...]` it instead kills at delays after the
+decoder unloads and records which outputs exist, their sizes, and whether a
+partial WAV parses.
 
 `make-listening-kit.py` writes a blind A/B kit of the retained reference and C++
 takes to `.phase0/listening/kit-1` with a scoring sheet and a separate key.

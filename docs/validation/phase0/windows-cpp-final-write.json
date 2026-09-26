@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "status": "failure-mode-confirmed",
+  "observedAt": "2026-09-26",
+  "binary": "d933ce730decc293f1c348cf4744860a57aa3d7d12aaa1a3924990f5e17c1709",
+  "requestSha256": "7da099e44b1f805dab030a7d7ec28baac11d5aeff9f0a7324943c3840019cf4b",
+  "method": "Popen.kill (TerminateProcess) a fixed delay after '[Store] Unload VAE', which yue-synth prints after decoding and before writing tokens.csv, latent.vae, score.abc, audio.wav and audio.json in that order",
+  "expectedSizes": {
+    "tokens.csv": 9281,
+    "latent.vae": 424704,
+    "score.abc": 874,
+    "audio.wav": 25481772,
+    "audio.json": 10634
+  },
+  "trials": [
+    {
+      "delayMs": 0,
+      "exitCode": 1,
+      "files": {}
+    },
+    {
+      "delayMs": 1,
+      "exitCode": 1,
+      "files": {}
+    },
+    {
+      "delayMs": 2,
+      "exitCode": 1,
+      "files": {}
+    },
+    {
+      "delayMs": 5,
+      "exitCode": 1,
+      "files": {}
+    },
+    {
+      "delayMs": 10,
+      "exitCode": 1,
+      "files": {}
+    },
+    {
+      "delayMs": 20,
+      "exitCode": 1,
+      "files": {}
+    },
+    {
+      "delayMs": 40,
+      "exitCode": 1,
+      "files": {}
+    },
+    {
+      "delayMs": 44,
+      "exitCode": 1,
+      "files": {
+        "tokens.csv": {
+          "bytes": 0,
+          "complete": false
+        }
+      }
+    },
+    {
+      "delayMs": 48,
+      "exitCode": 1,
+      "files": {}
+    },
+    {
+      "delayMs": 52,
+      "exitCode": 1,
+      "files": {
+        "tokens.csv": {
+          "bytes": 9281,
+          "complete": true
+        },
+        "latent.vae": {
+          "bytes": 424704,
+          "complete": true
+        },
+        "score.abc": {
+          "bytes": 874,
+          "complete": true
+        }
+      }
+    },
+    {
+      "delayMs": 56,
+      "exitCode": 1,
+      "files": {}
+    },
+    {
+      "delayMs": 60,
+      "exitCode": 1,
+      "files": {
+        "tokens.csv": {
+          "bytes": 9281,
+          "complete": true
+        },
+        "latent.vae": {
+          "bytes": 424704,
+          "complete": true
+        },
+        "score.abc": {
+          "bytes": 874,
+          "complete": true
+        },
+        "audio.wav": {
+          "bytes": 25481216,
+          "complete": false,
+          "parses": true,
+          "headerFrames": 3185146,
+          "readableFrames": 3185146
+        }
+      }
+    },
+    {
+      "delayMs": 64,
+      "exitCode": 1,
+      "files": {
+        "tokens.csv": {
+          "bytes": 9281,
+          "complete": true
+        },
+        "latent.vae": {
+          "bytes": 424704,
+          "complete": true
+        },
+        "score.abc": {
+          "bytes": 874,
+          "complete": true
+        },
+        "audio.wav": {
+          "bytes": 25481216,
+          "complete": false,
+          "parses": true,
+          "headerFrames": 3185146,
+          "readableFrames": 3185146
+        }
+      }
+    },
+    {
+      "delayMs": 68,
+      "exitCode": 1,
+      "files": {
+        "tokens.csv": {
+          "bytes": 9281,
+          "complete": true
+        },
+        "latent.vae": {
+          "bytes": 424704,
+          "complete": true
+        },
+        "score.abc": {
+          "bytes": 874,
+          "complete": true
+        },
+        "audio.wav": {
+          "bytes": 25481216,
+          "complete": false,
+          "parses": true,
+          "headerFrames": 3185146,
+          "readableFrames": 3185146
+        }
+      }
+    },
+    {
+      "delayMs": 72,
+      "exitCode": 1,
+      "files": {
+        "tokens.csv": {
+          "bytes": 9281,
+          "complete": true
+        },
+        "latent.vae": {
+          "bytes": 424704,
+          "complete": true
+        },
+        "score.abc": {
+          "bytes": 874,
+          "complete": true
+        },
+        "audio.wav": {
+          "bytes": 25481216,
+          "complete": false,
+          "parses": true,
+          "headerFrames": 3185146,
+          "readableFrames": 3185146
+        }
+      }
+    },
+    {
+      "delayMs": 76,
+      "exitCode": 1,
+      "files": {
+        "tokens.csv": {
+          "bytes": 9281,
+          "complete": true
+        },
+        "latent.vae": {
+          "bytes": 424704,
+          "complete": true
+        },
+        "score.abc": {
+          "bytes": 874,
+          "complete": true
+        },
+        "audio.wav": {
+          "bytes": 25481216,
+          "complete": false,
+          "parses": true,
+          "headerFrames": 3185146,
+          "readableFrames": 3185146
+        }
+      }
+    },
+    {
+      "delayMs": 80,
+      "exitCode": 1,
+      "files": {
+        "tokens.csv": {
+          "bytes": 9281,
+          "complete": true
+        },
+        "latent.vae": {
+          "bytes": 424704,
+          "complete": true
+        },
+        "score.abc": {
+          "bytes": 874,
+          "complete": true
+        },
+        "audio.wav": {
+          "bytes": 25481772,
+          "complete": true,
+          "parses": true,
+          "headerFrames": 3185216,
+          "readableFrames": 3185216
+        },
+        "audio.json": {
+          "bytes": 10634,
+          "complete": true
+        }
+      }
+    },
+    {
+      "delayMs": 160,
+      "exitCode": 1,
+      "files": {
+        "tokens.csv": {
+          "bytes": 9281,
+          "complete": true
+        },
+        "latent.vae": {
+          "bytes": 424704,
+          "complete": true
+        },
+        "score.abc": {
+          "bytes": 874,
+          "complete": true
+        },
+        "audio.wav": {
+          "bytes": 25481772,
+          "complete": true,
+          "parses": true,
+          "headerFrames": 3185216,
+          "readableFrames": 3185216
+        },
+        "audio.json": {
+          "bytes": 10634,
+          "complete": true
+        }
+      }
+    }
+  ],
+  "partialWav": {
+    "fileBytes": 25481216,
+    "riffDeclaresBytes": 25481772,
+    "dataChunkDeclaresBytes": 25481728,
+    "dataBytesPresent": 25481172,
+    "framesReadByLibsndfile": 3185146,
+    "framesExpected": 3185216
+  },
+  "findings": [
+    "All outputs are written within roughly 40-80 ms after the decoder unloads; timing varies between runs, so the same delay can land before or during writes",
+    "A kill during the audio write left audio.wav 556 bytes short with no audio.json; libsndfile parsed it without error and returned 70 fewer frames, so a truncated take looks valid and plays",
+    "The truncated WAV header still declares the full data size; comparing declared size with file length exposes it, but the app must not rely on parsing",
+    "One trial left a 0-byte tokens.csv; others left complete earlier files with the WAV missing",
+    "Kills at 80 and 160 ms returned exit code 1 after all five files were complete: output presence does not imply success, and a failed exit does not imply missing output",
+    "The Phase 3 worker must stage outputs under temporary names and promote them only after a clean exit and an explicit success message; the coordinator decides success from that message, never from files"
+  ],
+  "limitations": [
+    "Short fixture only; one machine; the write window is tens of milliseconds, so coverage of each byte offset is incidental"
+  ]
+}
