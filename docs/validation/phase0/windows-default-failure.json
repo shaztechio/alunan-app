@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "status": "failed",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.9",
+  "requestSha256": "a71bd9ea65c401f5e9187b0093bd5bf1e187deeb525e749a83302742d2bdab46",
+  "runs": [],
+  "networkAttempts": [],
+  "memoryScope": "RSS sampled every 100 ms for this Python process; CUDA allocator peaks exclude driver/other processes",
+  "networkScope": "Python audit hook blocks socket connect/DNS; not an OS firewall or native-library traffic capture",
+  "cacheState": "Not flushed; first process run is not proof of an OS cold-cache startup",
+  "profile": "yue2-reference-bf16",
+  "profileLockSha256": "fb72801b55cd7b51dba12862f5bfb94721533dcccf2f6011d2c62c6116c54fe7",
+  "assetVerificationSeconds": 4.030121299991151,
+  "modelCacheBytes": 7794565436.0,
+  "importSeconds": 1.5289664999872912,
+  "packages": {
+    "torch": "2.10.0+cu128",
+    "transformers": "4.57.6",
+    "huggingface-hub": "0.36.2",
+    "safetensors": "0.7.0",
+    "tiktoken": "0.12.0",
+    "numpy": "2.2.6",
+    "soundfile": "0.13.1",
+    "accelerate": "1.13.0",
+    "psutil": "7.2.2",
+    "yue2-infer": "0.1.6"
+  },
+  "torchCuda": "12.8",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "gpuMemoryBytes": 25756696576,
+  "pipelineInitSeconds": 5.699743000004673,
+  "error": {
+    "type": "RuntimeError",
+    "message": "USE_FLASH_ATTENTION was not enabled for build."
+  },
+  "totalSeconds": 17.9855993000092
+}

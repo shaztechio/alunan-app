@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "engineSource": "72272f907522dcca2e97c848d6c8f0d343999183",
+  "allMatched": true,
+  "modules": [
+    {
+      "path": "__init__.py",
+      "sha256": "e35b3471f497934fe5dbe4aa615fc571b82e075b973fef3eebbe994368148ea8"
+    },
+    {
+      "path": "cli.py",
+      "sha256": "d5b2b5453b1218677e93f13d81d6653cb17f933d7e946846fb16eec2c5813de7"
+    },
+    {
+      "path": "cuda_graph.py",
+      "sha256": "9c5bce70ce3eb7e465b4a670f1d7cfc97a997119fc8783d3ee02e51c98799c03"
+    },
+    {
+      "path": "fast.py",
+      "sha256": "e1722959ad0b0bf27eeaaf019cb9f109212a2450f03dd145866b1a0239151f38"
+    },
+    {
+      "path": "modeling_vae.py",
+      "sha256": "b6578ff461e6be9fd079ca5ddf12893940f3b3338ff3435fceae89c466486f5a"
+    },
+    {
+      "path": "modeling_yue2.py",
+      "sha256": "62d2bd758c8fff1a0d64584a699343076fca9a7880db5d8e19263bc30ae79d7c"
+    },
+    {
+      "path": "nar.py",
+      "sha256": "1a13a8e54b40229e008a270804a1fb830dfdf806735be484e8ce10171eb4b8d8"
+    },
+    {
+      "path": "pipeline.py",
+      "sha256": "48eda878c0af5b101a2f48f62c0d12ffb40db91c902b831bab1082be13c4af44"
+    },
+    {
+      "path": "progress.py",
+      "sha256": "8de1fa588607dd0525aee37b652f44b17350689ad9e6ddcba8aaa8aaccf61b24"
+    },
+    {
+      "path": "protocol.py",
+      "sha256": "e00d32bf22baac46c7d4dafaeecd4f3d5a4753d651b3dc8f4164b9f3774980ad"
+    },
+    {
+      "path": "quantization.py",
+      "sha256": "91e54fcd38a638727ebc05e240d2997097c541eec0cc18693fe429f702f38e78"
+    },
+    {
+      "path": "sampling.py",
+      "sha256": "b680afd5d6b6694b0e8d430b4c1b6d3b5108107672b06500ecc6645c471bf6c4"
+    },
+    {
+      "path": "storage.py",
+      "sha256": "a5bcc181b16412b45bc560e5264ba0b303667b5fd81957991ac0266c87fe2a5d"
+    },
+    {
+      "path": "tokenization_yue2.py",
+      "sha256": "fc88387f96e5db2020a0c3f5374b82726206026d83159b68b83e4136bb741acc"
+    }
+  ],
+  "benchmarkRunnerSha256": "4e21270233387ff2fe747c5f7cd9e35b7193d1c12bdc74f41bde09e17b49a9d5"
+}

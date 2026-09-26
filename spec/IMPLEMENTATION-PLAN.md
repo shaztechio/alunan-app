@@ -1,6 +1,6 @@
 # Phased implementation plan
 
-Status: planning only; every phase is **not started**.
+Status: **Phase 0 in progress**; phases 1–7 are not started.
 Last updated: 2026-09-26.
 
 [FEATURES.md](FEATURES.md) is the source of truth for product behavior.
@@ -8,9 +8,10 @@ Last updated: 2026-09-26.
 implementation and validation without changing either contract. The research
 and Bunyi references are recorded in [REFERENCES.md](REFERENCES.md).
 
-This document does not claim working code, measured hardware support, installed
-dependencies, or passing acceptance tests. Creating the plan does not start its
-implementation.
+Phase 0 research tools and evidence are recorded in the
+[feasibility report](../docs/validation/phase0/README.md) and
+[engine decision record](../docs/decisions/0001-engine-feasibility.md).
+No production native application or release acceptance gate has passed.
 
 ## Delivery constraints
 
@@ -32,7 +33,7 @@ implementation.
 
 | Phase | Outcome | Depends on | Status |
 | --- | --- | --- | --- |
-| 0. Prove engine and model feasibility | A measured local inference and redistribution path for every target | None | Not started |
+| 0. Prove engine and model feasibility | A measured local inference and redistribution path for every target | None | In progress |
 | 1. Establish application foundations | Native shells, contracts, fixtures, and build pipelines | 0 | Not started |
 | 2. Implement model preparation | Reliable on-demand download, verification, resume, and offline cache | 1 | Not started |
 | 3. Integrate the generation engine | App-managed worker and cancellable generation orchestration | 1 | Not started |
@@ -139,6 +140,15 @@ Work:
 
 Deliverables: engine decision record, benchmark/quality report, dependency and
 license inventory, provisional support matrix, and frozen candidate model profiles.
+
+Progress, 2026-09-26: source/model candidates and a Windows reference dependency
+environment are pinned; fixed requests and a local benchmark runner are present.
+Windows eager-reference short/repeated/full runs passed technical checks; the
+default backend's flash-attention failure is recorded. Listening and candidate
+comparisons remain open. WSL is an auxiliary Linux environment, not native
+Linux qualification. The user confirmed no Mac is currently available. All P0
+checkboxes stay open until their full cross-platform deliverables are satisfied;
+see the [evidence ledger](../docs/validation/phase0/README.md).
 
 **Exit gate:** each target has a complete local generation and a credible bundled
 runtime path, with measured limits recorded. This supplies preliminary AC-016
@@ -408,7 +418,7 @@ than using unverified download sizes, memory figures, or calendar estimates.
 | Decision | Resolve by | Basis |
 | --- | --- | --- |
 | Engine/backend and redistributable dependency set | End of phase 0 | Complete measured generation and bundled-runtime feasibility on each target. |
-| App license and approved model distribution terms | End of phase 0 | Recorded project license choice and review of the exact selected components/weights. |
+| Approved model distribution terms | End of phase 0 | Apache-2.0 source license selected and applied; exact selected components/weights still need distribution review. |
 | Candidate OS/architecture/GPU profiles and GTK baseline | End of phase 0; confirm in 6 | Actual compatibility, memory, quality, and latency evidence. |
 | Model revisions, origin, full asset set, hashes | End of phase 0; verify in 7 | Immutable files and approved distribution; no invented Lagu mirror. |
 | Pipe protocol and concrete data schemas | End of phase 1 | Cross-language fixtures, responsive cancellation, and version negotiation. |

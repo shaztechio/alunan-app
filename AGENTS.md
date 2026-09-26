@@ -1,7 +1,8 @@
 # Lagu repository guidance
 
-This repository currently contains planning documents only. Do not start
-application implementation unless the user requests it.
+Phase 0 feasibility work is authorized and in progress. The repository contains
+specifications and developer research tools; native application implementation
+has not started. Keep Phase 0 experiments separate from production app code.
 
 - Read `spec/FEATURES.md` before changing observable behavior. It is the shared
   source of truth for Windows, Linux, and macOS.
@@ -18,3 +19,13 @@ application implementation unless the user requests it.
   Swift with native Apple UI frameworks.
 - Bundle runtime dependencies. Models are downloaded on demand by the app;
   users must not manage terminals, dependency installers, or inference servers.
+- Keep research weights, environments, source checkouts, and generated audio in
+  ignored `.phase0/`. Track compact measurements, source/model pins, and findings
+  under `docs/validation/phase0/`; never count missing hardware as passing.
+
+## Active workspace
+
+The repository moved to `C:\Users\shazron\Documents\git\github.com\shaztechio\alunan-app`.
+Use that explicit working directory if this chat still starts in `lagu-app`.
+Read `docs/workspace-relocation.md` before resuming Phase 0; the copied research
+venv must be recreated before further inference. Keep historical evidence intact.

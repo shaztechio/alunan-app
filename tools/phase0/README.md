@@ -1,0 +1,122 @@
+# Phase 0 developer tools
+
+These tools run research experiments. They are not installers, app setup steps,
+the production model downloader, or the future worker protocol. Model/source
+archives, environments, and results live under ignored `.phase0/`.
+
+## Recorded Windows reference setup
+
+The inspected host has Python 3.12.9, .NET SDK 10.0.401, an RTX 4090, and a working
+NVIDIA driver. Source identities/archive hashes are in
+[`source-pins.json`](../../docs/validation/phase0/source-pins.json). Download the
+official source archive at that exact revision, verify its SHA-256, and extract
+it under `.phase0/yue2/` before using the commands below.
+
+```powershell
+python -m venv .phase0/reference-venv
+& .phase0/reference-venv/Scripts/python.exe -m pip install --index-url https://download.pytorch.org/whl/cu128 torch==2.10.0 --report .phase0/torch-install-report.json
+$taskSource = (Get-ChildItem .phase0/yue2 -Directory).FullName
+& .phase0/reference-venv/Scripts/python.exe -m pip install $taskSource --report .phase0/reference-install-report.json
+& .phase0/reference-venv/Scripts/python.exe -m pip check
+& .phase0/reference-venv/Scripts/python.exe tools/phase0/validate-locks.py
+```
+
+Those commands describe the observed setup; rerunning unconstrained pip can
+resolve newer transitive dependencies. For an exact repeat, use the recorded
+distribution URLs/SHA-256 values in
+[`windows-python-packages.lock.json`](../../docs/validation/phase0/windows-python-packages.lock.json)
+and install those verified wheels without dependency resolution, then install the
+YuE2 source with `--no-deps`. Build tooling also needs a lock before release.
+
+Prepare only one model profile. The reference requires 7.79 GB of model data;
+leave additional space for the several-GB environment, package cache and results.
+The script verifies every cached/downloaded file. It retains partials and uses
+PowerShell's range resume, but has no automatic retry loop or production UI.
+
+```powershell
+./tools/phase0/prepare-models.ps1 -Profile yue2-reference-bf16
+```
+
+If the host drops a large transfer, retain the partial. On the investigated host,
+PowerShell resume stalled; a bounded `curl --continue-at -` against the same pinned
+URL completed it. Rerun preparation to verify/promote the full-size partial. This
+is research-only recovery, not a tested implementation of AC-005/AC-006.
+
+Run with a new output directory each time (the runner rejects overwrites):
+
+```powershell
+& .phase0/reference-venv/Scripts/python.exe tools/phase0/run-reference.py --request tools/phase0/requests/short.json --output .phase0/runs/short --backend torch-eager --repeat 2
+& .phase0/reference-venv/Scripts/python.exe tools/phase0/run-reference.py --request tools/phase0/requests/full.json --output .phase0/runs/full --backend torch-eager
+```
+
+The default `torch` backend is deliberately selectable to reproduce the recorded
+Windows flash-attention failure. The eager option is an upstream backend, not an
+unrecorded patch. No automatic fallback occurs in this runner.
+
+The runner verifies local files before loading, sets offline environment flags,
+and blocks Python socket-connect/DNS audit events. It writes a report even when
+inference fails, checks finite/non-silent 48 kHz stereo WAV output, records
+truncation, and keeps the source artifacts. This is not OS-wide network denial,
+an audio listening review, or a clean-machine packaging check.
+
+## C++ candidate build recipe (not yet executed)
+
+Use a detached checkout at the recorded C++ commit and its pinned GGML submodule;
+check both before building. Avoid a bare source archive inheriting Lagu's Git
+identity through the upstream version-generation script. MSVC C++ Build Tools,
+CMake, and the CUDA build toolkit are developer requirements. They are not user
+installation requirements for Lagu.
+
+From a configured developer environment, configure with `GGML_CUDA=ON`,
+`GGML_NATIVE=OFF`, and an explicit tested architecture list (89 for the local
+RTX 4090 experiment). Build the `yue-synth` target. Record compiler/CMake/CUDA
+versions, flags, binary hashes, DLL/SO imports, and any patches. Do not treat a
+local architecture-89 build as suitable for every NVIDIA GPU.
+
+Prepare `yue2-cpp-q8` only when a runnable candidate is available. Convert the
+fixed request into the C++ schema: copy style/lyrics/cot, set both `lm_seed` and
+`seed` to the fixture seed, keep 32 ODE steps, one song/variation, `output_format`
+`wav32`, and the normal 360-second semantic budget. Record every effective
+setting; remove the reference-only `id`. Use `yue-synth --model ... --vae ...
+--request ... --out ... --score ... --tokens ... --latent ...`. Never start
+`yue-server` for this experiment.
+
+Compare intermediate BPE/AR/NAR/VAE results using upstream parity tools where
+compatible; float/quantized output is not expected to be byte-identical. Preserve
+the same decoder and distinguish any sampling/backend differences in the report.
+
+## Benchmark completion criteria
+
+For each real target: record exact OS/driver/hardware, revisions, hashes, settings,
+first-process and repeated same-process timing, stage timing, process and GPU
+memory scope, cache and peak temporary/output space, and output duration. Separate
+an OS cold-cache measurement from a first-process measurement.
+
+Listen to short/full pairs for intelligibility, lyric completion/order, consistent
+voice, clipping/noise, coherent structure and ending, and style adherence. Record
+reviewer/date and severity (pass/minor/major/fail); blind the engine labels where
+practical. Retain any truncation as a failure to complete that fixture. Agree on
+quality/latency targets after collecting the results, not from upstream claims.
+
+Then test repeated full jobs, out-of-memory handling, cancellation during each
+stage, missing/corrupt assets, unwritable output and worker termination. These
+remain separate evidence from the initial smoke runs. Test packaged offline
+generation with OS network denial later; Python audit hooks alone cannot qualify
+AC-003 or AC-016.
+
+## Reference cancellation probes
+
+After retaining the short benchmark's first take, run:
+
+```powershell
+& .phase0/reference-venv/Scripts/python.exe tools/phase0/check-cancellation.py .phase0/runs/windows-cancellation.json
+```
+
+Use a new report filename on each run. The probe verifies installed upstream
+source and model hashes, restores the saved plan and semantic tokens, and checks
+pre-cancelled planning, planning/semantic cancellation after eight tokens, and
+acoustic cancellation at the third callback check. It writes no new audio.
+Reported exception latency is relative to the synthetic flag, not an arbitrary
+external UI cancellation. CUDA allocator values after `close()`/collection are
+recorded without claiming zero driver overhead or a proven leak. Model-load,
+decoder, external process termination and cleanup deadlines require separate tests.

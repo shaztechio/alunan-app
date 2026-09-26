@@ -1,6 +1,6 @@
 # Lagu shared feature specification
 
-Status: initial planning baseline; all requirements are unimplemented.
+Status: Phase 0 research baseline; native application features are unimplemented.
 Last updated: 2026-09-26.
 
 This is the **source of truth for observable features and behavior** on Windows,
@@ -28,7 +28,7 @@ style, generate music locally, listen, and save the result.
 | APP-004 | Music generation, playback, projects, and installed-model checks MUST run locally. Lyrics, scores, reference media, and generated audio MUST NOT be uploaded for inference. No telemetry is included in the MVP. |
 | APP-005 | The app MUST download model data only when needed for a user-requested operation, or when the user explicitly selects Download in model settings. Launching the app alone MUST NOT download models. |
 | APP-006 | Standard application installers MUST contain runtime dependencies and MUST NOT bundle model weights. Internet is needed to acquire missing models; a complete installed model MUST work offline. Separate model packs support offline import. This supersedes the earlier plan to bundle a default model in every installer. |
-| APP-007 | The application MUST be free and its source open source. Model weights retain their own licenses, including any use restrictions; the app MUST identify those separately. |
+| APP-007 | The application MUST be free, and Lagu-authored source MUST use Apache-2.0 (selected on 2026-09-26). Third-party code and model weights retain their own licenses, including any use restrictions; the app MUST identify those separately. |
 
 The supported hardware/OS matrix is a release deliverable. Working operating
 system graphics drivers remain a machine prerequisite. The installer must not
@@ -186,7 +186,7 @@ accessibility testing. Successful compilation alone does not establish parity.
 | AC-012 Crash and stale events | APP-003, GEN-008..010, NET-001 | Kill the helper/app during download, generation, and save. Recover draft/cache; no orphan helper, late success, or stale playback. |
 | AC-013 Project portability | OUT-001..004 | Open and play a project on each OS without its model cache. Re-generation clearly prepares a compatible profile when needed. |
 | AC-014 Storage lifecycle | MOD-004, MOD-011..014, OUT-005 | Upgrade, Verify, Remove, local import, and simultaneous app instances preserve projects and cache correctness. |
-| AC-015 Native usability | DL-009, UX-001..004 | Keyboard/screen-reader use and display scaling keep progress, Stop, recovery, Help, and license information usable. |
+| AC-015 Native usability | APP-007, DL-009, UX-001..004 | Keyboard/screen-reader use and display scaling keep progress, Stop, recovery, Help, and license information usable. Credits identify Lagu's Apache-2.0 source license separately from dependency and model terms. |
 | AC-016 Full-song quality | GEN-007, GEN-010, OUT-002..003 | Real hardware produces audible songs, reports truncation honestly, and records the engine/model settings used. |
 
 | Feature group | Windows / WinForms | Linux / GTK 4 | macOS / Swift |

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-26",
+  "sources": [
+    {
+      "id": "yue2",
+      "repository": "https://github.com/multimodal-art-projection/YuE",
+      "commit": "72272f907522dcca2e97c848d6c8f0d343999183",
+      "archiveUrl": "https://codeload.github.com/multimodal-art-projection/YuE/zip/72272f907522dcca2e97c848d6c8f0d343999183",
+      "archiveSha256": "5b16a5c69cbfc96faed56897f87d00b86d41f584815716a598845ca4a2ab4c51",
+      "packageVersion": "0.1.6",
+      "codeLicense": "Apache-2.0"
+    },
+    {
+      "id": "yue2-cpp",
+      "repository": "https://github.com/ServeurpersoCom/yue2.cpp",
+      "commit": "f17d5268483db25c9d79a9d53967f9d31fd1ccd3",
+      "archiveUrl": "https://codeload.github.com/ServeurpersoCom/yue2.cpp/zip/f17d5268483db25c9d79a9d53967f9d31fd1ccd3",
+      "archiveSha256": "ee40d968266d60c1d883d622e93fb913132a8b722ce45c9f18831e942cbacf95",
+      "codeLicense": "MIT",
+      "submodules": {"ggml": "765bc96f9bb8d4c397c91c23b4e5c52a93fcf9b0"}
+    },
+    {
+      "id": "ggml",
+      "repository": "https://github.com/ServeurpersoCom/ggml",
+      "commit": "765bc96f9bb8d4c397c91c23b4e5c52a93fcf9b0",
+      "archiveUrl": "https://codeload.github.com/ServeurpersoCom/ggml/zip/765bc96f9bb8d4c397c91c23b4e5c52a93fcf9b0",
+      "archiveSha256": "3ed55b93bfb242efa88fbf934c7636e358be32122419592be1373540fe072cb5",
+      "codeLicense": "MIT"
+    },
+    {
+      "id": "yue2-mac-reference",
+      "repository": "https://github.com/arinltte/YuE2Mac",
+      "commit": "a67de3ed5d29d26f24aa85f8f5ed77772a2ffd41",
+      "archiveUrl": "https://codeload.github.com/arinltte/YuE2Mac/zip/a67de3ed5d29d26f24aa85f8f5ed77772a2ffd41",
+      "archiveSha256": "6ba4ad7502e840a7f006eba266afb6459fe931553c9000f0f59a475c8ef3e228",
+      "codeLicense": "MIT"
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-technical-checks-listening-pending",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.9",
+  "requestSha256": "a71bd9ea65c401f5e9187b0093bd5bf1e187deeb525e749a83302742d2bdab46",
+  "runs": [
+    {
+      "index": 1,
+      "generationSeconds": 113.85709989999305,
+      "saveSeconds": 0.5662609999999404,
+      "audioSeconds": 78.95866666666667,
+      "sampleRate": 48000,
+      "channels": 2,
+      "finiteNonSilentAudio": true,
+      "truncated": {
+        "abc": false,
+        "semantic": false
+      },
+      "timing": {
+        "abc": {
+          "seconds": 22.491343600006076,
+          "prefill_seconds": 0.2697581000102218,
+          "ttft_seconds": 0.401798000006238,
+          "output_tokens": 730,
+          "content_tokens": 729,
+          "output_tps": 32.45693156365291,
+          "prefix_tokens": 90,
+          "cfg_branches": 1,
+          "execution": "eager",
+          "attention": "sdpa"
+        },
+        "semantic": {
+          "seconds": 65.45127390002017,
+          "prefill_seconds": 0.05925399999250658,
+          "ttft_seconds": 0.06023170001571998,
+          "output_tokens": 1975,
+          "content_tokens": 1974,
+          "output_tps": 30.17511932643058,
+          "prefix_tokens": 821,
+          "cfg_branches": 1,
+          "execution": "eager",
+          "attention": "sdpa"
+        },
+        "nar_seconds": 16.4396376000077,
+        "vae_seconds": 3.282861999992747,
+        "load": {
+          "resolve_and_integrity_seconds": 5.547494699974777,
+          "mot_load_seconds": 0.30995970001094975
+        },
+        "e2e_seconds": 113.85640760001843
+      },
+      "peakRssBytes": 9705385984,
+      "rssAfterSaveBytes": 9757765632,
+      "wavSha256": "5f0cdfe4d28fb7802e96dff8d6933853216d0ff17ce15bca354e57e1bf69fa86",
+      "outputBytes": 44792620,
+      "listeningReview": "not performed",
+      "peakCudaAllocatedBytes": 9155142144,
+      "peakCudaReservedBytes": 11047796736
+    },
+    {
+      "index": 2,
+      "generationSeconds": 113.24520239999401,
+      "saveSeconds": 0.49623230000725016,
+      "audioSeconds": 78.95866666666667,
+      "sampleRate": 48000,
+      "channels": 2,
+      "finiteNonSilentAudio": true,
+      "truncated": {
+        "abc": false,
+        "semantic": false
+      },
+      "timing": {
+        "abc": {
+          "seconds": 25.841680500016082,
+          "prefill_seconds": 0.05064020000281744,
+          "ttft_seconds": 0.05153330002212897,
+          "output_tokens": 730,
+          "content_tokens": 729,
+          "output_tps": 28.248936828993987,
+          "prefix_tokens": 90,
+          "cfg_branches": 1,
+          "execution": "eager",
+          "attention": "sdpa"
+        },
+        "semantic": {
+          "seconds": 67.26269110001158,
+          "prefill_seconds": 0.06916430001729168,
+          "ttft_seconds": 0.06999760001781397,
+          "output_tokens": 1975,
+          "content_tokens": 1974,
+          "output_tps": 29.36248859064249,
+          "prefix_tokens": 821,
+          "cfg_branches": 1,
+          "execution": "eager",
+          "attention": "sdpa"
+        },
+        "nar_seconds": 16.46268629998667,
+        "vae_seconds": 2.0008632999961264,
+        "load": {
+          "resolve_and_integrity_seconds": 5.547494699974777,
+          "mot_load_seconds": 0.30995970001094975
+        },
+        "e2e_seconds": 113.24481080000987
+      },
+      "peakRssBytes": 9697161216,
+      "rssAfterSaveBytes": 9585819648,
+      "wavSha256": "de84a9a79f17a9c9e296ab4157320338829ba21969afbc07af0c4f9254e59ba8",
+      "outputBytes": 44792630,
+      "listeningReview": "not performed",
+      "peakCudaAllocatedBytes": 9423276032,
+      "peakCudaReservedBytes": 11328815104
+    }
+  ],
+  "networkAttempts": [],
+  "memoryScope": "RSS sampled every 100 ms for this Python process; CUDA allocator peaks exclude driver/other processes",
+  "networkScope": "Python audit hook blocks socket connect/DNS; not an OS firewall or native-library traffic capture",
+  "cacheState": "Not flushed; first process run is not proof of an OS cold-cache startup",
+  "profile": "yue2-reference-bf16",
+  "profileLockSha256": "fb72801b55cd7b51dba12862f5bfb94721533dcccf2f6011d2c62c6116c54fe7",
+  "assetVerificationSeconds": 3.9899617999908514,
+  "modelCacheBytes": 7794565436.0,
+  "importSeconds": 1.4568600000056904,
+  "packages": {
+    "torch": "2.10.0+cu128",
+    "transformers": "4.57.6",
+    "huggingface-hub": "0.36.2",
+    "safetensors": "0.7.0",
+    "tiktoken": "0.12.0",
+    "numpy": "2.2.6",
+    "soundfile": "0.13.1",
+    "accelerate": "1.13.0",
+    "psutil": "7.2.2",
+    "yue2-infer": "0.1.6"
+  },
+  "torchCuda": "12.8",
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "gpuMemoryBytes": 25756696576,
+  "pipelineInitSeconds": 5.5475596000032965,
+  "totalSeconds": 239.36605079998844
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-26",
+  "os": "Windows 11 Pro",
+  "version": "10.0.26200",
+  "architecture": "x64",
+  "systemRamBytes": 101960773632,
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "nvidiaSmiVramMiB": 24564,
+  "driver": "617.14",
+  "computeCapability": "8.9",
+  "dotnetSdk": "10.0.401",
+  "python": "3.12.9",
+  "workspaceFreeBytesAtCapture": 365992697856,
+  "linux": {
+    "kind": "WSL2",
+    "distribution": "Ubuntu 24.04.2",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "nativeQualification": false
+  },
+  "mac": {
+    "available": false,
+    "evidence": "User confirmed no Mac available yet"
+  }
+}

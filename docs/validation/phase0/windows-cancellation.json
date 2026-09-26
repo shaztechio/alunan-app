@@ -1,0 +1,60 @@
+{
+  "status": "passed",
+  "runnerSha256": "b389a6d95f67d3a6cee45da7d714e83fba04000349f9b0d43160cbe1ba20a023",
+  "backend": "torch-eager",
+  "device": "cuda",
+  "cases": [
+    {
+      "name": "pre-cancelled-planning",
+      "status": "passed",
+      "message": "Cancelled before prefill",
+      "cancellationToExceptionSeconds": 5.952650799998082,
+      "elapsedSeconds": 5.952658299996983,
+      "tokens": 0,
+      "checks": 1,
+      "cudaAllocatedAfterCloseBytes": 0,
+      "cudaReservedAfterCloseBytes": 0
+    },
+    {
+      "name": "planning-after-8-tokens",
+      "status": "passed",
+      "message": "Cancelled during abc",
+      "cancellationToExceptionSeconds": 0.026700599992182106,
+      "elapsedSeconds": 3.898358400008874,
+      "tokens": 8,
+      "checks": 10,
+      "cudaAllocatedAfterCloseBytes": 8519680,
+      "cudaReservedAfterCloseBytes": 20971520
+    },
+    {
+      "name": "semantic-after-8-tokens",
+      "status": "passed",
+      "message": "Cancelled during semantic",
+      "cancellationToExceptionSeconds": 0.028030900022713467,
+      "elapsedSeconds": 3.5751467999943998,
+      "tokens": 8,
+      "checks": 10,
+      "cudaAllocatedAfterCloseBytes": 8519680,
+      "cudaReservedAfterCloseBytes": 20971520
+    },
+    {
+      "name": "acoustic-after-3-checks",
+      "status": "passed",
+      "message": "Cancelled during acoustic flow matching",
+      "cancellationToExceptionSeconds": 0.0001176999940071255,
+      "elapsedSeconds": 3.772116600011941,
+      "tokens": 0,
+      "checks": 3,
+      "cudaAllocatedAfterCloseBytes": 9568256,
+      "cudaReservedAfterCloseBytes": 23068672
+    }
+  ],
+  "networkAttempts": [],
+  "scope": "Upstream Python callbacks only; not UI Stop, process supervision, or a cancellation deadline guarantee",
+  "engineSource": "72272f907522dcca2e97c848d6c8f0d343999183",
+  "modelLockSha256": "fb72801b55cd7b51dba12862f5bfb94721533dcccf2f6011d2c62c6116c54fe7",
+  "requestSha256": "a71bd9ea65c401f5e9187b0093bd5bf1e187deeb525e749a83302742d2bdab46",
+  "semanticSha256": "721b8bfc678782099bbf36c523c9651fcc0da2014268dcc75448a4cae34c3025",
+  "torch": "2.10.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 4090"
+}

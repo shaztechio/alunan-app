@@ -1,0 +1,4 @@
+# Local Phase 0 source archives, environments, weights, logs, and generated audio.
+/.phase0/
+__pycache__/
+*.pyc

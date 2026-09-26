@@ -50,3 +50,7 @@ candidate capabilities; none establishes a tested Lagu release configuration.
 
 Upstream branches can change. Implementation must freeze exact source, dependency,
 and model revisions and re-check licenses before producing release packages.
+
+Phase 0 began on 2026-09-26. Exact source/model pins and subsequent local evidence
+are now maintained in [the Phase 0 report](../docs/validation/phase0/README.md).
+The moving links above are background references, not build inputs.
