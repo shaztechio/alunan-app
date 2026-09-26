@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "observedAt": "2026-09-26",
+  "archive": {
+    "url": "https://developer.download.nvidia.com/compute/cuda/redist/libcublas/windows-x86_64/libcublas-windows-x86_64-13.6.0.2-archive.zip",
+    "manifest": "https://developer.download.nvidia.com/compute/cuda/redist/redistrib_13.3.1.json",
+    "bytes": 393706755,
+    "sha256": "62e9fa30560c8f0a28e0cdcf9d6fc1fed347bcfab8847239b9ae1fdc1d86408a",
+    "matchedPin": true,
+    "entries": 25,
+    "uncompressedBytes": 518722310,
+    "unsafeEntryNames": 0,
+    "download": "curl with --continue-at; one uninterrupted transfer; resume not exercised"
+  },
+  "extracted": {
+    "cublas64_13.dll": {
+      "archivePath": "libcublas-windows-x86_64-13.6.0.2-archive/bin/x64/cublas64_13.dll",
+      "bytes": 52697712,
+      "sha256": "8c6bac24474af29627ec96500025a5d410a1b7e8ffa00e1fe13b1781fc6b3ddc",
+      "identicalToToolkitCopy": true
+    },
+    "cublasLt64_13.dll": {
+      "archivePath": "libcublas-windows-x86_64-13.6.0.2-archive/bin/x64/cublasLt64_13.dll",
+      "bytes": 463655536,
+      "sha256": "e323abd89e0f03c1db91a09d7aeb1928de08e1f86192cc713b335fefe3e368a9",
+      "identicalToToolkitCopy": true
+    },
+    "LICENSE.txt": {
+      "archivePath": "libcublas-windows-x86_64-13.6.0.2-archive/LICENSE",
+      "bytes": 68070,
+      "sha256": "088381bc2d891e719a2a9398645b00bb45f3b24231473a8283ac7e3e66b8a028",
+      "identicalToToolkitCopy": null
+    }
+  },
+  "authenticode": {
+    "cublas64_13.dll": "Valid, CN=NVIDIA Corporation, DigiCert timestamp",
+    "cublasLt64_13.dll": "Valid, CN=NVIDIA Corporation, DigiCert timestamp"
+  },
+  "imports": {
+    "cublas64_13.dll": [
+      "cublasLt64_13.dll",
+      "KERNEL32.dll"
+    ],
+    "cublasLt64_13.dll": [
+      "KERNEL32.dll"
+    ]
+  },
+  "toolkitFreeRun": {
+    "fixture": "tools/phase0/requests/short.json",
+    "binary": "sm_89 build (windows-cpp-build.json)",
+    "environment": "PATH = extracted pack folder + %SystemRoot%/System32 + %SystemRoot% + System32/Wbem; CUDA_PATH* removed",
+    "toolkitDllsLoaded": [],
+    "relevantLoadedDlls": [
+      "%SystemRoot%/System32/DriverStore/FileRepository/nv_dispi.inf_amd64_da865124972e1f80/nvapi64_impl.dll",
+      "%SystemRoot%/System32/DriverStore/FileRepository/nv_dispi.inf_amd64_da865124972e1f80/nvcuda64.dll",
+      "%SystemRoot%/System32/DriverStore/FileRepository/nv_dispi.inf_amd64_da865124972e1f80/nvcudart_hybrid64.dll",
+      "%SystemRoot%/System32/msvcp140.dll",
+      "%SystemRoot%/System32/nvapi64.dll",
+      "%SystemRoot%/System32/nvcuda.dll",
+      "%SystemRoot%/System32/vcomp140.dll",
+      "%SystemRoot%/System32/vcruntime140.dll",
+      "%SystemRoot%/System32/vcruntime140_1.dll",
+      "<repo>/.phase0/runtime-packs/cublas-13.6.0.2-win-x64/files/cublas64_13.dll",
+      "<repo>/.phase0/runtime-packs/cublas-13.6.0.2-win-x64/files/cublasLt64_13.dll",
+      "<repo>/.phase0/yue2-cpp-build-cuda-sm89/ggml-base.dll",
+      "<repo>/.phase0/yue2-cpp-build-cuda-sm89/ggml-cpu.dll",
+      "<repo>/.phase0/yue2-cpp-build-cuda-sm89/ggml-cuda.dll",
+      "<repo>/.phase0/yue2-cpp-build-cuda-sm89/ggml.dll"
+    ],
+    "wavSha256": "7c7025c597fee071e0c4b40d6a8915d4e1bd384ccc4375db4b6c319a31adadca",
+    "identicalToEarlierToolkitRun": true,
+    "processSeconds": 29.769513600011123,
+    "timingNote": "Not a performance result: a multi-architecture CUDA build was compiling on all CPU cores concurrently"
+  },
+  "licenseFindings": [
+    "Bundled LICENSE is the NVIDIA Software License Agreement and CUDA Supplement",
+    "Attachment A lists the CUDA BLAS Library (Windows cublas.dll, cublasLt.dll, including versioned file names) as distributable with applications developed by the licensee",
+    "Distribution requirements include material additional functionality beyond the SDK and that distributable portions are accessed only by the licensee's application",
+    "The agreement states it binds whoever downloads or uses the software; whether an app-initiated end-user download from NVIDIA fits the distribution grant is not resolved here and needs review"
+  ],
+  "limitations": [
+    "MSVC runtime and OpenMP loaded from System32 because this machine has the VC++ 14.51 redistributable installed; a clean machine is still untested",
+    "Isolation used PATH, not the full-path loading MOD-015 requires: the executable's folder and System32 precede PATH, so a planted cublas64_13.dll there would win. The Phase 3 worker must control DLL search (for example SetDefaultDllDirectories plus AddDllDirectory before a runtime-loaded ggml CUDA backend)",
+    "Driver-provided CUDA components (nvcuda, nvcudart_hybrid64, nvapi) load from the NVIDIA driver store, as expected for the machine prerequisite"
+  ]
+}

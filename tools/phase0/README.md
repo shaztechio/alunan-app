@@ -101,12 +101,26 @@ cmd /c tools\phase0\build-yue2-cpp.cmd
 & .phase0/reference-venv/Scripts/python.exe tools/phase0/run-cpp.py --request tools/phase0/requests/full.json --output .phase0/runs/full-cpp
 ```
 
+`build-yue2-cpp.cmd` takes an optional architecture list and build name, for
+example `"75-real;86-real;89-real;120-real;120-virtual" yue2-cpp-build-cuda-multi`.
+
 `run-cpp.py` verifies binary and model hashes, writes the converted request,
 runs each repeat as a new `yue-synth` process, samples process RSS and
 device-wide GPU memory, and applies the same WAV checks as the reference runner.
 For upstream's `tests/debug-nar-cossim.py`, the checkout needs `build/` (with an
 extensionless `yue-synth` hard link on Windows), `models/`, and `checkpoints/`
 hard-linked to verified files, plus `modeling_vae.py` from the installed package.
+
+`run-cpp.py --runtime-dir <folder>` reduces the child's PATH to that folder and
+the Windows system folders, removes `CUDA_PATH*`, and records every DLL the
+process maps. It tests a runtime pack without the toolkit; it is not the
+full-path loading MOD-015 requires of the app.
+
+`probe-cpp-termination.py <new-report.json>` kills `yue-synth` at five stage
+markers and records exit latency, device GPU release, and leftover files.
+
+`make-listening-kit.py` writes a blind A/B kit of the retained reference and C++
+takes to `.phase0/listening/kit-1` with a scoring sheet and a separate key.
 
 ## Benchmark completion criteria
 

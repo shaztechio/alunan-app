@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "status": "built-and-run",
+  "observedAt": "2026-09-26",
+  "configure": {
+    "CMAKE_CUDA_ARCHITECTURES": "75-real;86-real;89-real;120-real;120-virtual",
+    "GGML_NATIVE": "OFF",
+    "script": "tools/phase0/build-yue2-cpp.cmd \"75-real;86-real;89-real;120-real;120-virtual\" yue2-cpp-build-cuda-multi",
+    "toolchain": "same as windows-cpp-build.json"
+  },
+  "buildSeconds": 509,
+  "buildNote": "Wall time on 16 CPU threads; a short GPU run overlapped part of it",
+  "binariesSha256": {
+    "yue-synth.exe": "0fa38231a1782c74f7478a1dc725f849b6ba052e733c4e4c988f6b7dcc4f10b9",
+    "ggml.dll": "78c4f060b3410ca50852787b76ff477081084689ffd1a5d28658a428d3ab329e",
+    "ggml-base.dll": "8e443001f616540b7aad5e8b6f4ecbe1578265ba1be751af1e04115e403503ed",
+    "ggml-cpu.dll": "3a10f30f67502333cc4ec4bc3528775c8483fa910f4d72e302dcd60f8dafcf5e",
+    "ggml-cuda.dll": "641c4bd337d5a3f9b49b9e48395f7c412038e08a49c3abc82444bb458241f478"
+  },
+  "ggmlCudaBytes": {
+    "sm89Only": 51575296,
+    "multiArchitecture": 103734272
+  },
+  "resolvedTargets": "ggml rewrote 120 to the architecture-specific 120a: SASS sm_75, sm_86, sm_89, sm_120a plus compute_120a PTX",
+  "rtx4090ShortRun": {
+    "wavSha256": "7c7025c597fee071e0c4b40d6a8915d4e1bd384ccc4375db4b6c319a31adadca",
+    "identicalToSm89Build": true,
+    "processSeconds": 14.689336800016463,
+    "sm89ProcessSeconds": 14.35,
+    "peakRssBytes": 2452287488,
+    "peakGpuUsedAboveBaselineBytes": 5615124480
+  },
+  "findings": [
+    "The multi-architecture ggml-cuda.dll is about 2x the single-architecture one (+52 MB), still small beside cuBLAS",
+    "On the RTX 4090 the multi-architecture build selects the same sm_89 code: identical WAV and equivalent time",
+    "compute_120a PTX is architecture-specific, so it is not a forward-compatible fallback for GPU generations after Blackwell; a generic PTX target would need an explicit ggml override and its own measurement",
+    "sm_75, sm_86 and sm_120a code paths were compiled but not executed: no Turing, Ampere or Blackwell GPU is available"
+  ]
+}

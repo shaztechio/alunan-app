@@ -26,6 +26,15 @@ Listening, clean-machine loading, cancellation, and non-Windows targets remain
 open, so this strengthens the evaluation order without selecting the backend.
 The CUDA build needs cuBLAS/cuBLASLt (about 516 MB) beside the worker.
 
+Forced termination is a workable Stop mechanism for `yue-synth`: at every
+probed stage the process exited within 80 ms and released GPU memory within
+140 ms, with no partial outputs ([record](../validation/phase0/windows-cpp-termination.json)).
+The worker must still stage final outputs under temporary names. A
+multi-architecture CUDA build costs about 52 MB and 509 s of build time; ggml's
+`120a` rewrite means its PTX is not a forward-compatible fallback
+([record](../validation/phase0/windows-cpp-multiarch.json)). Supported GPUs
+will follow measurements on those GPUs.
+
 The reference callback probes also expose integration gaps: an already-cancelled
 planning call loads the model before checking cancellation, and `decode()` has no
 cancellation parameter. Do not treat the Python pipeline alone as satisfying
@@ -111,12 +120,13 @@ The candidate pin matches the toolkit that built the recorded binaries (CUDA
 | Windows x64 | `https://developer.download.nvidia.com/compute/cuda/redist/libcublas/windows-x86_64/libcublas-windows-x86_64-13.6.0.2-archive.zip` | 393,706,755 | `62e9fa30560c8f0a28e0cdcf9d6fc1fed347bcfab8847239b9ae1fdc1d86408a` |
 | Linux x64 | `libcublas-linux-x86_64-13.6.0.2-archive.tar.xz` in the same manifest | 817,981,368 | Pin when the Linux build is evaluated |
 
-These values come from NVIDIA's published `redistrib_13.3.1.json` and have not
-been downloaded or extracted. Before Phase 0 closes: download and verify the
-archive, confirm its `cublas64_13.dll`/`cublasLt64_13.dll` match the files the
-build was tested with, record per-file digests, test full-path loading with the
-toolkit absent, and review whether NVIDIA's terms permit the app to fetch the
-archive for the user and which notices to show. The Linux archive is larger than
+These values come from NVIDIA's published `redistrib_13.3.1.json`. The Windows
+archive was downloaded and verified on 2026-09-26: its DLLs are byte-identical to
+the tested toolkit copies, NVIDIA-signed, and run the engine with the toolkit
+absent from the environment ([record](../validation/phase0/windows-runtime-pack.json)).
+Still required before Phase 0 closes: full-path loading from a worker, and a
+review of whether NVIDIA's terms permit the app to fetch the archive for the
+user and which notices to show. The Linux archive is larger than
 the Windows DLLs because it includes static libraries; that user-visible cost
 is recorded rather than avoided. If the terms review fails, return to FEATURES.md
 before choosing another distribution method.

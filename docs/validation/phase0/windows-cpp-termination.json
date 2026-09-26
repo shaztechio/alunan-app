@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "platform": "Windows-11-10.0.26200-SP0",
+  "binary": "d933ce730decc293f1c348cf4744860a57aa3d7d12aaa1a3924990f5e17c1709",
+  "requestSha256": "7da099e44b1f805dab030a7d7ec28baac11d5aeff9f0a7324943c3840019cf4b",
+  "method": "Popen.kill (TerminateProcess) on first stderr marker",
+  "gpuScope": "device-wide nvidia-smi memory.used; released = within 64 MiB of the pre-run baseline",
+  "probes": [
+    {
+      "stage": "model-load",
+      "marker": "[Load] LM backend",
+      "gpuBaselineBytes": 1619001344,
+      "markerSeconds": 0.3272904999903403,
+      "gpuAtKillAboveBaselineBytes": 12582912,
+      "exitSeconds": 0.04326559999026358,
+      "exitCode": 1,
+      "gpuReleasedSeconds": 0.08628419999149628,
+      "processStillOnGpu": false,
+      "filesLeft": {}
+    },
+    {
+      "stage": "score",
+      "marker": "[AR] Score 100/",
+      "gpuBaselineBytes": 1721761792,
+      "markerSeconds": 1.9076524999982212,
+      "gpuAtKillAboveBaselineBytes": 5456789504,
+      "exitSeconds": 0.07845740002812818,
+      "exitCode": 1,
+      "gpuReleasedSeconds": 0.12424500001361594,
+      "processStillOnGpu": false,
+      "filesLeft": {}
+    },
+    {
+      "stage": "semantic",
+      "marker": "[AR] Semantic 100/",
+      "gpuBaselineBytes": 1635778560,
+      "markerSeconds": 4.4858094999799505,
+      "gpuAtKillAboveBaselineBytes": 5595201536,
+      "exitSeconds": 0.07579339999938384,
+      "exitCode": 1,
+      "gpuReleasedSeconds": 0.1241843999887351,
+      "processStillOnGpu": false,
+      "filesLeft": {}
+    },
+    {
+      "stage": "acoustic",
+      "marker": "[NAR] Step 5/",
+      "gpuBaselineBytes": 1635778560,
+      "markerSeconds": 10.67493330000434,
+      "gpuAtKillAboveBaselineBytes": 4989124608,
+      "exitSeconds": 0.0738744999980554,
+      "exitCode": 1,
+      "gpuReleasedSeconds": 0.12389660000917502,
+      "processStillOnGpu": false,
+      "filesLeft": {}
+    },
+    {
+      "stage": "decode",
+      "marker": "[VAE] Graph:",
+      "gpuBaselineBytes": 1635778560,
+      "markerSeconds": 13.886125599994557,
+      "gpuAtKillAboveBaselineBytes": 5058330624,
+      "exitSeconds": 0.07943899999372661,
+      "exitCode": 1,
+      "gpuReleasedSeconds": 0.1358036000165157,
+      "processStillOnGpu": false,
+      "filesLeft": {}
+    }
+  ],
+  "status": "passed",
+  "observedAt": "2026-09-26",
+  "fixture": "tools/phase0/requests/short.json (converted request from windows-short-cpp-q8)",
+  "findings": [
+    "Every stage exited within 80 ms of TerminateProcess and device GPU memory returned within 64 MiB of baseline within 140 ms; no compute process remained",
+    "No output files existed at any probed stage: yue-synth writes tokens, latents, score, audio and replay JSON only after decoding completes",
+    "Not probed: the final write phase. yue-synth writes each output directly to its target path, so a kill there can leave partial files; the worker must write to temporary names and promote after completion",
+    "yue-synth has no cancellation channel; Stop in the app therefore relies on process termination for this candidate unless a cooperative-cancel patch is added in Phase 3"
+  ],
+  "limitations": [
+    "GPU release is device-wide nvidia-smi memory.used, not per-process driver accounting",
+    "One kill per stage on one machine; not a repeated stress test",
+    "Kill is issued by the parent that launched the process; OS job-object behavior on parent crash is Phase 3 work"
+  ]
+}
