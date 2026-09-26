@@ -26,7 +26,12 @@ resolve newer transitive dependencies. For an exact repeat, use the recorded
 distribution URLs/SHA-256 values in
 [`windows-python-packages.lock.json`](../../docs/validation/phase0/windows-python-packages.lock.json)
 and install those verified wheels without dependency resolution, then install the
-YuE2 source with `--no-deps`. Build tooling also needs a lock before release.
+YuE2 source with `--no-deps`. `install-reference-venv.py` does this and refuses to
+reuse an existing venv directory:
+
+```powershell
+python tools/phase0/install-reference-venv.py
+``` Build tooling also needs a lock before release.
 
 Prepare only one model profile. The reference requires 7.79 GB of model data;
 leave additional space for the several-GB environment, package cache and results.
