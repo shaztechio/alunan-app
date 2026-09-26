@@ -4,6 +4,7 @@ Local workspace: **alunan-app**. See the [relocation note](docs/workspace-reloca
 for the active path, recovered files, and research environment follow-up.
 
 A planned free, open-source desktop app for local music generation with YuE.
+Website: [alunan.app](https://alunan.app/) (see [docs/README.md](docs/README.md)).
 
 Native interfaces: WinForms on Windows, GTK 4/Gir.Core on Linux, and Swift on
 macOS. The application includes its runtime dependencies and manages its own

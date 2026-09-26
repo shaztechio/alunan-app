@@ -32,6 +32,7 @@ folders alone does not verify a working compiler or a redistributable package.
 | Official model preparation | Passed | All 17 reference assets downloaded and checked locally; 7,794,565,436 total bytes |
 | Interrupted transfer recovery | Observed successful recovery | Initial generator transfer ended early at 3,255,258,007 bytes; PowerShell resume stalled; bounded curl range recovery completed; whole-file SHA-256 then matched |
 | Reference dependencies | Passed | `pip check`; torch 2.10.0+cu128 detects RTX 4090; YuE2 imports. [31 distribution artifacts](windows-python-packages.lock.json) recorded |
+| Relocated reference venv recreation | Passed | Rebuilt in `alunan-app` from the hash lock with `--require-hashes --no-deps`; `pip check` passed; all 14 installed modules matched the source record; RTX 4090 visible; 4,881,476,240 bytes. The incomplete 250 MB copy is retained as `.phase0/reference-venv-copied-unqualified` |
 | Windows default `torch` backend | Failed | [Failure report](windows-default-failure.json): `USE_FLASH_ATTENTION was not enabled for build.` at CUDA graph decode; no audio result |
 | Windows `torch-eager`, short fixture twice | Passed technical checks; listening pending | [Report](windows-short-eager.json): both runs complete, finite/non-silent 48 kHz stereo; no truncation; no Python network attempts |
 | Windows `torch-eager`, full fixture | Passed technical checks; listening pending | [Report](windows-full-eager.json): 166.119 s of audio in 262.795 s; no truncation or Python network attempts |

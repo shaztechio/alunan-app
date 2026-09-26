@@ -34,3 +34,13 @@ The user subsequently confirmed the GitHub repository rename on 2026-09-26.
 The Git remote is now `git@github.com:shaztechio/alunan-app.git`, and the root
 README uses Alunan. Historical evidence, proposed namespaces, and persisted-format
 identifiers retain their existing names pending a separate contract-wide rename.
+
+Venv follow-up (2026-09-26): the copied `.phase0/reference-venv` held only about
+250 MB of the 4.88 GB measured environment, confirming it was not reusable. It
+was renamed to `.phase0/reference-venv-copied-unqualified` (not deleted) and a
+new venv was created with `tools/phase0/install-reference-venv.py`, which installs
+every wheel in the package lock by URL and SHA-256 without dependency resolution.
+`pip check`, the lock validator, all 14 installed source-module hashes, and CUDA
+device detection passed. The YuE2 source was installed with `--no-build-isolation`
+using the locked setuptools; its built wheel is not part of the evidence set.
+No inference was rerun, as no benchmark input changed.
