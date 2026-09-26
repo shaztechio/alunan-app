@@ -54,6 +54,7 @@ and Ninja 1.13.2 are pip packages in ignored `.phase0/build-tools-venv`, not PAT
 | C++ cold vs warm start | Measured | [Record](windows-cpp-cold-start.json): uncached models add about 2 s to a 14 s short job on NVMe; no temporary files; writes equal outputs |
 | C++ bad model files and scarce VRAM | Measured; two app requirements found | [Record](windows-cpp-failures.json): missing/truncated/bad-header/wrong files fail fast; missing decoder fails after generation; same-size decoder corruption exits 0 with silent audio; low free VRAM slowed rather than failed under WDDM; true OOM not reproduced |
 | C++ CPU-only fallback, short fixture | Completes; too slow for a default | [Record](windows-short-cpp-q8-cpu.json): 67 s of audio in 950 s on a Ryzen 9 7950X (about 66x slower than the RTX 4090); 5.9 GB peak RSS; different rendition from CUDA |
+| Clean Windows image (Sandbox), engine bundle | Passed | [Record](windows-sandbox-clean.json): no VC++ runtime in the image; engine fails without app-local DLLs (0xC0000135) and loads everything from the bundle with them; no driver, so automatic CPU fallback; offline; WAV identical to the host CPU run |
 | C++ multi-architecture CUDA build | Built; RTX 4090 only exercised | [Record](windows-cpp-multiarch.json): sm_75/86/89/120a + compute_120a; ggml-cuda.dll 103.7 MB vs 51.6 MB; identical WAV on the 4090; other architectures untested |
 | Standalone packaging | Not run | Current Python venv is a developer environment; no clean-machine package tested |
 
@@ -220,6 +221,16 @@ Forced onto a Ryzen 9 7950X, the short song took 950 s (about 16 minutes) for
 does not promise CPU support, and advertising it would need a spec decision and
 measured minimums first.
 
+**Clean Windows image.** In Windows Sandbox (fresh image, networking and GPU
+off) the Visual C++ runtime and OpenMP DLLs were absent. The engine failed to
+start without the bundle's app-local copies (STATUS_DLL_NOT_FOUND) and, with
+them, loaded every non-Windows DLL from the bundle, including cuBLAS from its
+separate folder. With no NVIDIA driver, CUDA initialization failed and the
+engine silently fell back to the CPU, completing offline in 957 s with a WAV
+identical to the host's CPU run. The app must bundle the C++ runtime and must
+detect a missing GPU itself instead of starting a CPU run unannounced. A clean
+machine with an NVIDIA GPU is still needed for the CUDA path.
+
 **Listening review.** `tools/phase0/make-listening-kit.py` wrote blind A/B pairs
 of the retained short and full takes through one WAV writer with equal
 timestamps, a scoring sheet, and a separate key. The project owner listened on
@@ -298,8 +309,8 @@ Next work, by what it needs:
 
 - A human reviewer, later: more takes and reviewers once other targets produce
   audio; the first Windows review is recorded.
-- Other hardware: a clean Windows machine without the VC++ redistributable;
-  Turing/Ampere/Blackwell GPUs for architecture coverage; native Linux; Apple
+- Other hardware: a clean Windows machine with only the NVIDIA driver (the
+  clean-image DLL check passed in Windows Sandbox); Turing/Ampere/Blackwell GPUs for architecture coverage; native Linux; Apple
   Silicon for Metal. None of these can be counted as passing until run.
 - Here: the Windows C++ feasibility checks this machine can run are done.
   Native Linux and Apple Silicon hardware validation remain explicit open gates.
