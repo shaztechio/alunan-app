@@ -55,7 +55,7 @@ integration are deferred. Saving a generated score does not imply an MVP score e
 | GEN-007 | Progress MUST distinguish checking, downloading, verifying, loading, planning music where applicable, generating audio, and saving the result. Download completion MUST NOT be presented as music completion. |
 | GEN-008 | Stop MUST cancel the entire operation, including retry waits and reconnects, and prevent all later stages from starting. Display Stopping until work has actually stopped; retain reusable download bytes. Ignore late events from the cancelled job. |
 | GEN-009 | After a stop or failure, retain composer inputs and previous results. A later Generate creates a new snapshot and reuses compatible cached data. Failed or cancelled work MUST NOT be presented or auto-played as a successful new result. |
-| GEN-010 | Report success only after a playable audio file and its project metadata are saved. A model that reaches a generation limit MUST produce an explicit incomplete-result warning if audio is retained. |
+| GEN-010 | Report success only after a playable audio file and its project metadata are saved. A model that reaches a generation limit MUST produce an explicit incomplete-result warning if audio is retained. An engine's success report is not sufficient: before saving a take as successful, the app MUST check that the audio is finite, not silent, and has the expected format and a plausible duration. Audio that fails these checks is a failed generation, not a take; the error suggests verifying the model files (MOD-011), and the audio is kept only as a diagnostic, never shown or auto-played as a result. |
 
 Suggested first-use copy:
 
@@ -195,7 +195,7 @@ accessibility testing. Successful compilation alone does not establish parity.
 | AC-013 Project portability | OUT-001..004 | Open and play a project on each OS without its model cache. Re-generation clearly prepares a compatible profile when needed. |
 | AC-014 Storage lifecycle | MOD-004, MOD-011..015, OUT-005 | Upgrade, Verify, Remove, local import, and simultaneous app instances preserve projects and cache correctness. |
 | AC-015 Native usability | APP-007, DL-009, UX-001..004 | Keyboard/screen-reader use and display scaling keep progress, Stop, recovery, Help, and license information usable. Credits identify Lagu's Apache-2.0 source license separately from dependency and model terms. |
-| AC-016 Full-song quality | GEN-007, GEN-010, OUT-002..003 | Real hardware produces audible songs, reports truncation honestly, and records the engine/model settings used. |
+| AC-016 Full-song quality | GEN-007, GEN-010, OUT-002..003 | Real hardware produces audible songs, reports truncation honestly, and records the engine/model settings used. An engine run that reports success but yields silent or non-finite audio (for example with same-size corrupted decoder weights) ends as a failure with a Verify suggestion, and no take is added. |
 | AC-017 GPU runtime pack | MOD-012..013, MOD-015 | Wrong archive digest, extra or traversal archive entries, a tampered same-size runtime file, and a same-named library planted in PATH, the app folder, or the working directory are rejected or never loaded. Importing the pinned vendor archive offline works. A machine whose backend needs no pack downloads none. |
 
 | Feature group | Windows / WinForms | Linux / GTK 4 | macOS / Swift |
