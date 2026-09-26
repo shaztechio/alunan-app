@@ -40,7 +40,7 @@ and Ninja 1.13.2 are pip packages in ignored `.phase0/build-tools-venv`, not PAT
 | Windows `torch-eager`, short fixture twice | Passed technical checks; listening pending | [Report](windows-short-eager.json): both runs complete, finite/non-silent 48 kHz stereo; no truncation; no Python network attempts |
 | Windows `torch-eager`, full fixture | Passed technical checks; listening pending | [Report](windows-full-eager.json): 166.119 s of audio in 262.795 s; no truncation or Python network attempts |
 | Windows upstream cancellation callbacks | Four interruption probes passed; limitations found | [Report](windows-cancellation.json): pre-cancel still loads model; small CUDA allocations persist after in-process close; decoder has no cancellation callback |
-| Windows C++ CUDA build (sm_89) | Passed | [Build record](windows-cpp-build.json): pinned commit/submodule, no patches, binary hashes and DLL imports; cuBLAS/cuBLASLt (516 MB) must be redistributed |
+| Windows C++ CUDA build (sm_89) | Passed | [Build record](windows-cpp-build.json): pinned commit/submodule, no patches, binary hashes and DLL imports; cuBLAS/cuBLASLt (516 MB) needed at run time, to be downloaded from NVIDIA as a GPU runtime pack (decision 2026-09-26) |
 | Windows C++ Q8, short fixture in two processes | Passed technical checks; listening pending | [Report](windows-short-cpp-q8.json): 66.359 s of audio in 14.35 s per process; identical WAV hashes across processes; no truncation |
 | Windows C++ Q8, full fixture | Passed technical checks; listening pending | [Report](windows-full-cpp-q8.json): 169.839 s of audio in 37.68 s; no truncation; 3 float samples exceed full scale (peak 1.072) |
 | Q8 acoustic-stage parity vs Python float32 | Passed (informational) | [Report](windows-q8-nar-cossim.json): upstream harness; final latent cosine 0.999888, decoded audio STFT cosine 0.999957 |
@@ -140,8 +140,9 @@ paths to a child running in another directory; that runner defect was fixed and
 its output kept as `.phase0/runs/windows-short-cpp-q8-relative-path-runner-bug`.
 
 These results do not select a production backend. Remaining for this candidate:
-blind listening against the reference, a clean-machine load test with colocated
-MSVC/OpenMP/cuBLAS DLLs and no toolkit, a multi-architecture CUDA build decision,
+blind listening against the reference, a clean-machine load test with bundled
+MSVC/OpenMP DLLs and cuBLAS loaded by full path from a verified runtime-pack
+directory with no toolkit, a multi-architecture CUDA build decision,
 cancellation/termination probes, and native Linux builds.
 
 ## Cancellation follow-up (2026-09-26)
@@ -208,6 +209,7 @@ the three-native-platform/local-generation scope is unchanged.
 
 Next independent work: a recorded blind listening comparison of the saved
 reference and C++ short/full takes (needs a human reviewer); a clean-machine
-load test of the C++ binaries with colocated runtime/cuBLAS DLLs; C++ process
-termination/cancellation probes; and a CUDA architecture-list decision. Native
+load test with cuBLAS from the pinned NVIDIA archive (MOD-015) plus a review of
+NVIDIA's end-user download terms; C++ process termination/cancellation probes;
+and a CUDA architecture-list decision. Native
 Linux and Apple Silicon hardware validation remain explicit open gates.

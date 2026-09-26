@@ -23,11 +23,11 @@ style, generate music locally, listen, and save the result.
 | ID | Requirement |
 | --- | --- |
 | APP-001 | Windows MUST use WinForms; Linux MUST use GTK 4 through Gir.Core; macOS MUST use Swift with native Apple UI frameworks. |
-| APP-002 | A supported machine MUST need only the Lagu application installation. The package MUST include the required application runtimes, engine, and redistributable libraries. No terminal, Python/pip, Homebrew, .NET, GTK, or CUDA toolkit setup may be delegated to the user. |
+| APP-002 | A supported machine MUST need only the Lagu application installation. The package MUST include the required application runtimes, engine, and redistributable libraries, except vendor GPU runtime packs that the app itself prepares under MOD-015. No terminal, Python/pip, Homebrew, .NET, GTK, or CUDA toolkit setup may be delegated to the user. |
 | APP-003 | The app MUST start, supervise, stop, and clean up its generation helper automatically. No separately launched server, console window, port entry, service configuration, or login is required. |
 | APP-004 | Music generation, playback, projects, and installed-model checks MUST run locally. Lyrics, scores, reference media, and generated audio MUST NOT be uploaded for inference. No telemetry is included in the MVP. |
-| APP-005 | The app MUST download model data only when needed for a user-requested operation, or when the user explicitly selects Download in model settings. Launching the app alone MUST NOT download models. |
-| APP-006 | Standard application installers MUST contain runtime dependencies and MUST NOT bundle model weights. Internet is needed to acquire missing models; a complete installed model MUST work offline. Separate model packs support offline import. This supersedes the earlier plan to bundle a default model in every installer. |
+| APP-005 | The app MUST download model data, and any GPU runtime pack the selected profile requires (MOD-015), only when needed for a user-requested operation, or when the user explicitly selects Download in model settings. Launching the app alone MUST NOT download models or runtime packs. |
+| APP-006 | Standard application installers MUST contain runtime dependencies and MUST NOT bundle model weights or vendor GPU runtime packs. Internet is needed to acquire missing models and runtime packs; a complete installed model and its runtime pack MUST work offline. Separate model packs support offline import. This supersedes the earlier plan to bundle a default model in every installer; excluding vendor GPU libraries was decided on 2026-09-26 because they would dominate installer size. |
 | APP-007 | The application MUST be free, and Lagu-authored source MUST use Apache-2.0 (selected on 2026-09-26). Third-party code and model weights retain their own licenses, including any use restrictions; the app MUST identify those separately. |
 
 The supported hardware/OS matrix is a release deliverable. Working operating
@@ -50,7 +50,7 @@ integration are deferred. Saving a generated score does not imply an MVP score e
 | GEN-002 | Invalid or missing required inputs MUST be identified before network access or model loading. The supported model profile supplies input limits; do not silently truncate user text. |
 | GEN-003 | Generate MUST snapshot the submitted inputs, model profile/revision, and source selection. Preparation and generation use that snapshot. Lock generation-affecting inputs while it is active; keep playback, Help, and Logs available. |
 | GEN-004 | Check local model readiness first. If files are missing, prepare only the selected operation's dependencies, then continue into generation automatically. The user MUST NOT have to press Generate a second time after downloading. |
-| GEN-005 | Before Generate, a missing-model notice MUST describe the one-time download, approximate remaining size when known, automatic continuation, and future reuse. Derive this notice from actual model readiness, not a first-launch flag. |
+| GEN-005 | Before Generate, a missing-model notice MUST describe the one-time download, including any required GPU runtime pack, approximate remaining size when known, automatic continuation, and future reuse. Derive this notice from actual model and runtime readiness, not a first-launch flag. |
 | GEN-006 | Permit one active preparation/generation operation per app. Generate becomes Stop throughout preparation, downloading, verification, loading, and generation. Escape invokes Stop while the operation is active. |
 | GEN-007 | Progress MUST distinguish checking, downloading, verifying, loading, planning music where applicable, generating audio, and saving the result. Download completion MUST NOT be presented as music completion. |
 | GEN-008 | Stop MUST cancel the entire operation, including retry waits and reconnects, and prevent all later stages from starting. Display Stopping until work has actually stopped; retain reusable download bytes. Ignore late events from the cancelled job. |
@@ -61,6 +61,9 @@ Suggested first-use copy:
 
 > This song needs a music-model download (about {size}). Lagu saves the files for
 > reuse and starts generating automatically when they are ready.
+
+When a GPU runtime pack is also missing, say so in the same notice, for example
+"music model and NVIDIA GPU components", with one combined size.
 
 If size is unavailable, say that it is being determined; never invent an estimate.
 Once the required files are installed, Generate proceeds locally without this notice.
@@ -79,7 +82,7 @@ draft and reuses its downloads when the user chooses Generate again.
 
 | ID | Requirement |
 | --- | --- |
-| MOD-001 | Ship a curated model catalog and a recommended compatible profile. A profile MUST identify every required generator, decoder, tokenizer/configuration, and license asset; the user must not assemble the pipeline. |
+| MOD-001 | Ship a curated model catalog and a recommended compatible profile. A profile MUST identify every required generator, decoder, tokenizer/configuration, and license asset, and any GPU runtime pack its backend needs on the current platform; the user must not assemble the pipeline. |
 | MOD-002 | Download only the chosen profile's required assets. Alternate quantizations, other languages' separate models, transcription models, and optional capabilities MUST NOT download speculatively. |
 | MOD-003 | The catalog MUST pin immutable model revisions and compatible engine versions. An existing project/model MUST NOT silently switch revision, quantization, decoder, backend, or source during a run. |
 | MOD-004 | Models MUST be stored persistently in a writable per-user cache outside the installed application. Restarting or upgrading the app MUST preserve them. |
@@ -89,10 +92,11 @@ draft and reuses its downloads when the user chooses Generate again.
 | MOD-008 | A ready model MUST be usable without DNS, HTTP HEAD, manifest refresh, source availability checks, authentication refresh, or another network prerequisite. The engine MUST use local assets and MUST NOT fetch additional dependencies behind the app's back. |
 | MOD-009 | Before downloading, check hardware/runtime compatibility, cache/output writability, and disk space for remaining bytes plus required temporary and output storage. Missing models are a normal preparation step. A warning about predicted memory pressure is distinct from a confirmed incompatibility. |
 | MOD-010 | If offline with missing files, explain that a one-time download is required, identify what is missing, preserve the draft/partials, and offer Retry when connectivity returns. Installed compatible models and existing audio remain usable. |
-| MOD-011 | Settings MUST list model name/profile, local state, size on disk, version, and license. Provide Download without generation, Verify, Remove, and Open models folder. Remove identifies the model and never deletes projects or exported audio. |
-| MOD-012 | Support importing a complete compatible model pack from local storage for users preparing an offline machine. Apply the same identity, completeness, and integrity checks as downloading. Never execute code supplied by a model pack. |
-| MOD-013 | Installation and model preparation MUST be distinct. Model preparation may fetch data assets, but MUST NOT invoke pip, package managers, remote scripts, or separately installed runtimes. |
+| MOD-011 | Settings MUST list model name/profile, local state, size on disk, version, and license, and each installed GPU runtime pack with vendor, version, size, and license. Provide Download without generation, Verify, Remove, and Open models folder. Remove identifies the model or runtime pack and never deletes projects or exported audio. |
+| MOD-012 | Support importing a complete compatible model pack from local storage for users preparing an offline machine. Apply the same identity, completeness, and integrity checks as downloading. Never execute code supplied by a model pack. A GPU runtime pack is imported only as the exact vendor archive pinned by the catalog, verified under MOD-015. |
+| MOD-013 | Installation and model preparation MUST be distinct. Model preparation may fetch data assets and catalog-pinned vendor GPU runtime packs (MOD-015), but MUST NOT invoke pip, package managers, vendor installers, remote scripts, or separately installed runtimes. |
 | MOD-014 | Cache mutations MUST be coordinated across processes. Simultaneous instances must not append to the same partial, delete an in-use model, or expose half-installed files as ready. |
+| MOD-015 | When the selected backend needs vendor GPU libraries that the installer omits (NVIDIA cuBLAS for CUDA on Windows and Linux), prepare them as a GPU runtime pack. Download only from the vendor's canonical redistributable archive pinned in the packaged catalog by URL, size, and SHA-256; verify the archive before extraction; extract only the catalog-listed files, each with its own SHA-256, into a per-user runtime cache separate from models; and load them only by full path from that verified location. Verify every runtime file's full SHA-256 before each helper launch that loads it. Never run a vendor installer, substitute a same-named library from PATH or the system, or accept runtime code from a model pack. Machines whose backend does not need a pack MUST NOT download one. Show the vendor's license terms with the pack. |
 
 Full verification is required on installation/import, explicit Verify, and after a
 known file change or failed load suggesting corruption. Normal ready-model checks
@@ -127,6 +131,10 @@ Completion measures unique retained data, not cumulative retry traffic or an
 average of file percentages. If a server forces a file to restart or verification
 rejects data, correct the meter and explain the restart; do not preserve a false
 monotonic percentage. At 100% transfer, the model can still be verifying.
+
+GPU runtime pack archives are part of the same preparation job and meters. The
+current-file label identifies them as GPU components; archive verification and
+extraction are shown as verification, not as network stalls or music progress.
 
 ## 5. Download interruption and source recovery
 
@@ -172,9 +180,9 @@ accessibility testing. Successful compilation alone does not establish parity.
 
 | Scenario | Requirement coverage | Expected result |
 | --- | --- | --- |
-| AC-001 Clean install | APP-001..006 | Install with no developer runtimes present. App opens without a terminal, extra setup, or model download. |
-| AC-002 First song | GEN-001..007, MOD-001..005 | Generate with valid inputs and an empty cache downloads only required assets, then generates automatically. |
-| AC-003 Offline reuse | APP-004, MOD-008 | With a ready model, deny all network access. Generate, save, play, and export succeed; no model-source request is attempted. |
+| AC-001 Clean install | APP-001..006 | Install with no developer runtimes present. App opens without a terminal, extra setup, model download, or GPU runtime download. |
+| AC-002 First song | GEN-001..007, MOD-001..005, MOD-015 | Generate with valid inputs and an empty cache downloads only required assets, including a GPU runtime pack only where the backend needs one, then generates automatically. |
+| AC-003 Offline reuse | APP-004, MOD-008 | With a ready model and any required runtime pack, deny all network access. Generate, save, play, and export succeed; no model-source or vendor request is attempted. |
 | AC-004 Offline first use | MOD-010, GEN-009 | Empty cache while offline gives useful recovery and preserves inputs. No cloud inference fallback occurs. |
 | AC-005 Stop/resume | GEN-008..009, MOD-007, NET-001..002 | Stop midway through a large file, restart the app, and Generate. Valid files are skipped and a supported range resumes exactly. |
 | AC-006 Range edge cases | NET-002 | Exercise valid/invalid 206, ignored Range/200, 416, and changed source identity. No duplicated, mixed, or falsely complete bytes. |
@@ -185,9 +193,10 @@ accessibility testing. Successful compilation alone does not establish parity.
 | AC-011 Preflight | GEN-002, MOD-009 | Bad inputs, unwritable paths, confirmed incompatibility, or insufficient storage are caught before large transfers. |
 | AC-012 Crash and stale events | APP-003, GEN-008..010, NET-001 | Kill the helper/app during download, generation, and save. Recover draft/cache; no orphan helper, late success, or stale playback. |
 | AC-013 Project portability | OUT-001..004 | Open and play a project on each OS without its model cache. Re-generation clearly prepares a compatible profile when needed. |
-| AC-014 Storage lifecycle | MOD-004, MOD-011..014, OUT-005 | Upgrade, Verify, Remove, local import, and simultaneous app instances preserve projects and cache correctness. |
+| AC-014 Storage lifecycle | MOD-004, MOD-011..015, OUT-005 | Upgrade, Verify, Remove, local import, and simultaneous app instances preserve projects and cache correctness. |
 | AC-015 Native usability | APP-007, DL-009, UX-001..004 | Keyboard/screen-reader use and display scaling keep progress, Stop, recovery, Help, and license information usable. Credits identify Lagu's Apache-2.0 source license separately from dependency and model terms. |
 | AC-016 Full-song quality | GEN-007, GEN-010, OUT-002..003 | Real hardware produces audible songs, reports truncation honestly, and records the engine/model settings used. |
+| AC-017 GPU runtime pack | MOD-012..013, MOD-015 | Wrong archive digest, extra or traversal archive entries, a tampered same-size runtime file, and a same-named library planted in PATH, the app folder, or the working directory are rejected or never loaded. Importing the pinned vendor archive offline works. A machine whose backend needs no pack downloads none. |
 
 | Feature group | Windows / WinForms | Linux / GTK 4 | macOS / Swift |
 | --- | --- | --- | --- |
@@ -196,8 +205,10 @@ accessibility testing. Successful compilation alone does not establish parity.
 | Progress, Stop, recovery, integrity | Required; planned | Required; planned | Required; planned |
 | Generation, playback, projects, export | Required; planned | Required; planned | Required; planned |
 | Model settings, local help, accessibility | Required; planned | Required; planned | Required; planned |
+| GPU runtime pack (MOD-015) | Required for CUDA; planned | Required for CUDA; planned | Not expected: Metal is part of macOS; confirm with the selected backend |
 
 Permitted differences: native layout, OS storage locations, accessibility API,
-GPU backend, and engine-specific model format. Supported profiles may differ
-after measurement. Such differences must be recorded before release, with a
-user-visible capability explanation; they do not waive core feature behavior.
+GPU backend, engine-specific model format, and whether a GPU runtime pack is
+needed. Supported profiles may differ after measurement. Such differences must be
+recorded before release, with a user-visible capability explanation; they do not
+waive core feature behavior.
