@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "observedAt": "2026-09-26",
+  "environment": {
+    "kind": "Windows Sandbox (fresh image) on the Windows 11 Pro host; networking and vGPU disabled",
+    "os": "Microsoft Windows 11 Enterprise 10.0.26100.0",
+    "cpu": "AMD Ryzen 9 7950X 16-Core Processor            ",
+    "ramBytes": 17178759168,
+    "gpus": [
+      "Microsoft Remote Display Adapter driver 10.0.26100.9549"
+    ],
+    "bundle": "tools/phase0/bundle/make-bundle.ps1 output (multi-architecture build, app-local VC++ 14.44 CRT and OpenMP, verified cuBLAS pack); models mapped read-only"
+  },
+  "system32Runtime": {
+    "msvcp140.dll": false,
+    "vcruntime140.dll": false,
+    "vcruntime140_1.dll": false,
+    "vcomp140.dll": false,
+    "nvcuda.dll": false
+  },
+  "bundleFiles": {
+    "ggml-base.dll": "8e443001f616540b7aad5e8b6f4ecbe1578265ba1be751af1e04115e403503ed",
+    "ggml-cpu.dll": "3a10f30f67502333cc4ec4bc3528775c8483fa910f4d72e302dcd60f8dafcf5e",
+    "ggml-cuda.dll": "641c4bd337d5a3f9b49b9e48395f7c412038e08a49c3abc82444bb458241f478",
+    "ggml.dll": "78c4f060b3410ca50852787b76ff477081084689ffd1a5d28658a428d3ab329e",
+    "msvcp140.dll": "0f885b509a685d2bbfa652fed26b5fb31d88fbdab0a978c641d1c7b8aa460aa9",
+    "vcomp140.dll": "55aba23cdcd6484fbb06f4155b8ca75adfce7a881f10afd0c49457165e677164",
+    "vcruntime140.dll": "d5e4d9a3e835fa679450145d6a7d94e36573a509317111904d9b3712c30d9066",
+    "vcruntime140_1.dll": "1f2d41c4aa5db0bc33ebf7b66d72943a817d7ce6cbe880502a9403823633093f",
+    "yue-synth.exe": "0fa38231a1782c74f7478a1dc725f849b6ba052e733c4e4c988f6b7dcc4f10b9",
+    "cublas64_13.dll": "8c6bac24474af29627ec96500025a5d410a1b7e8ffa00e1fe13b1781fc6b3ddc",
+    "cublasLt64_13.dll": "e323abd89e0f03c1db91a09d7aeb1928de08e1f86192cc713b335fefe3e368a9",
+    "LICENSE.txt": "088381bc2d891e719a2a9398645b00bb45f3b24231473a8283ac7e3e66b8a028"
+  },
+  "negativeControl": {
+    "exitCode": "0xC0000135",
+    "meaning": "0xC0000135 STATUS_DLL_NOT_FOUND: without the app-local runtime DLLs the engine cannot start"
+  },
+  "loadCheck": {
+    "exitCode": "0x00000001",
+    "printedVersion": true
+  },
+  "generation": {
+    "exitCode": "0x00000000",
+    "seconds": 957.35,
+    "timedOut": false,
+    "backendLines": [
+      "ggml_cuda_init: failed to initialize CUDA: (null)",
+      "[Load] KV backend: CPU (CPU threads: 16)",
+      "[Load] LM backend: CPU (CPU threads: 16)",
+      "[Load] NAR backend: CPU (CPU threads: 16)",
+      "[Load] VAE backend: CPU (CPU threads: 16)",
+      "[Pipeline] Done: 1 tracks, 67.2 s of audio in 951.5 s (0.1x realtime)"
+    ],
+    "wavBytes": 25788972,
+    "wavSha256": "77bfea5afa027a87a2a4d18596eb5b4d66fd49f23b807a7bf74d44b91e3f14ce",
+    "identicalToHostCpuRun": true
+  },
+  "loadedModulesOutsideWindows": [
+    "C:\\alunan\\bundle\\engine\\ggml.dll",
+    "C:\\alunan\\bundle\\engine\\ggml-base.dll",
+    "C:\\alunan\\bundle\\engine\\ggml-cpu.dll",
+    "C:\\alunan\\bundle\\engine\\ggml-cuda.dll",
+    "C:\\alunan\\bundle\\engine\\MSVCP140.dll",
+    "C:\\alunan\\bundle\\engine\\VCOMP140.DLL",
+    "C:\\alunan\\bundle\\engine\\VCRUNTIME140.dll",
+    "C:\\alunan\\bundle\\engine\\VCRUNTIME140_1.dll",
+    "C:\\alunan\\bundle\\engine\\yue-synth.exe",
+    "C:\\alunan\\bundle\\runtime\\cublas\\cublas64_13.dll",
+    "C:\\alunan\\bundle\\runtime\\cublas\\cublasLt64_13.dll"
+  ],
+  "findings": [
+    "The clean image has no Visual C++ runtime or OpenMP DLLs in System32; without the bundled copies the engine fails to start with STATUS_DLL_NOT_FOUND, so the app must ship them",
+    "With the bundle, every non-Windows DLL loaded from the bundle: engine and ggml libraries, app-local CRT/OpenMP, and cuBLAS from the separate runtime folder",
+    "No NVIDIA driver was present: CUDA initialization failed and the engine fell back to the CPU automatically, printing only 'ggml_cuda_init: failed to initialize CUDA: (null)'. The app must detect this itself (MOD-009) rather than let a 66x slower CPU run start silently",
+    "Generation completed offline (networking disabled) in 957 s and produced a WAV byte-identical to the host's CPU-only run"
+  ],
+  "limitations": [
+    "No GPU in the sandbox, so the CUDA path on a clean machine is not exercised; that needs a real clean PC with only the NVIDIA driver",
+    "The sandbox uses the host's Windows build (26100 base image); other Windows versions are not covered"
+  ]
+}

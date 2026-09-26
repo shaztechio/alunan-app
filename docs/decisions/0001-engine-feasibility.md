@@ -49,6 +49,12 @@ short and full takes pass and preferred the C++ Q8 take for both fixtures
 ([review](../validation/phase0/windows-listening-review-1.json)). With its
 limits, it removes quality as a reason to prefer the Python reference on Windows.
 
+A clean Windows Sandbox image confirmed the Windows runtime closure: the
+engine needs app-local Visual C++ CRT and OpenMP DLLs, loads everything else
+from its bundle, and without a GPU driver falls back to the CPU silently
+([record](../validation/phase0/windows-sandbox-clean.json)). The app's
+compatibility check must catch that before a run starts.
+
 The reference callback probes also expose integration gaps: an already-cancelled
 planning call loads the model before checking cancellation, and `decode()` has no
 cancellation parameter. Do not treat the Python pipeline alone as satisfying
