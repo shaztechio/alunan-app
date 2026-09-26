@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "status": "recorded",
+  "reviewDate": "2026-09-26",
+  "reviewer": "Project owner (single reviewer)",
+  "playback": "Speakers",
+  "method": "Blind A/B kit from tools/phase0/make-listening-kit.py: both engines' takes rewritten through one float32 WAV writer with identical samples and equal timestamps, random A/B order per pair, key opened only after answers were recorded",
+  "engines": {
+    "reference": "YuE2 Python torch-eager BF16 (windows-short-eager / windows-full-eager take 1)",
+    "candidate": "yue2.cpp f17d526 Q8_0 + F32 VAE, CUDA sm_89 (windows-short-cpp-q8 / windows-full-cpp-q8 take 1)"
+  },
+  "pairs": {
+    "short": {
+      "A": {"engine": "reference", "sourceSha256": "5f0cdfe4d28fb7802e96dff8d6933853216d0ff17ce15bca354e57e1bf69fa86", "overall": "pass", "audibleDistortion": true, "peakAbs": 0.926, "samplesAboveFullScale": 0},
+      "B": {"engine": "candidate", "sourceSha256": "7c7025c597fee071e0c4b40d6a8915d4e1bd384ccc4375db4b6c319a31adadca", "overall": "pass", "audibleDistortion": false, "peakAbs": 0.9722, "samplesAboveFullScale": 0},
+      "preferred": "B (candidate)"
+    },
+    "full": {
+      "A": {"engine": "reference", "sourceSha256": "c8be0f22cf668dba85f1d7257fa7f0b040885b8da699a21c9f9eb6871cb1effc", "overall": "pass", "audibleDistortion": false, "peakAbs": 1.0, "samplesAboveFullScale": 0},
+      "B": {"engine": "candidate", "sourceSha256": "ddde2f996c3e079784a546e43298fb09955b0acdee29ee2618a44be65c68c99c", "overall": "pass", "audibleDistortion": true, "peakAbs": 1.0723, "samplesAboveFullScale": 3, "overFullScaleAtSeconds": [141.3, 144.0]},
+      "preferred": "B (candidate)"
+    }
+  },
+  "summary": "All four takes passed overall. The C++ Q8 candidate was preferred for both the short and the full fixture. Some audible distortion was reported in one take from each engine.",
+  "analysis": [
+    "The distorted reference take (short A) has no samples near full scale, so that distortion is in the generated audio, not digital clipping",
+    "The distorted candidate take (full B) has three isolated samples above full scale near 141.3 s and 144.0 s; three single samples are unlikely to explain audible distortion on their own, so it is probably also generative. Not localized by the reviewer"
+  ],
+  "limitations": [
+    "One reviewer, one playback system, one take per engine and fixture; not statistically meaningful",
+    "Ratings were collected as one overall severity per clip, not per criterion from the scoring sheet",
+    "Durations differ between engines (short 78.96 s vs 66.36 s; full 166.12 s vs 169.84 s), so blinding was imperfect",
+    "The candidate was clip B in both pairs by random draw, so position and engine are confounded",
+    "The question about clipping, asked together with the preference questions, mentioned that the full candidate take has samples above full scale, which may have hinted at an engine"
+  ],
+  "decisionUse": "Supports keeping yue2.cpp Q8 as the leading Windows CUDA candidate on quality. Does not by itself set the quality bar, which still needs more takes, reviewers, and the other targets"
+}

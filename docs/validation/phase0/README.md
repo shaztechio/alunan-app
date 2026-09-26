@@ -45,7 +45,11 @@ and Ninja 1.13.2 are pip packages in ignored `.phase0/build-tools-venv`, not PAT
 | Windows C++ Q8, full fixture | Passed technical checks; listening pending | [Report](windows-full-cpp-q8.json): 169.839 s of audio in 37.68 s; no truncation; 3 float samples exceed full scale (peak 1.072) |
 | Q8 acoustic-stage parity vs Python float32 | Passed (informational) | [Report](windows-q8-nar-cossim.json): upstream harness; final latent cosine 0.999888, decoded audio STFT cosine 0.999957 |
 | C++ Metal compilation and inference | Not run | No Mac |
-| AR (LM) logit parity and listening comparison | Not run | Upstream LM harness targets a BF16 GGUF outside the pinned profile; no listening review yet |
+| AR (LM) logit parity | Not run | Upstream LM harness targets a BF16 GGUF outside the pinned profile |
+| Blind listening, reference vs C++ Q8 (Windows) | Recorded; one reviewer | [Review](windows-listening-review-1.json): all four takes pass overall; C++ candidate preferred for short and full; one distorted take per engine; small sample with listed blinding limits |
+| Pinned NVIDIA cuBLAS runtime pack (Windows) | Passed | [Record](windows-runtime-pack.json): archive matched pinned size/SHA-256; allow-listed DLLs identical to the tested toolkit copies and NVIDIA-signed; short fixture with no toolkit on PATH loaded cuBLAS only from the pack and reproduced the WAV hash |
+| C++ forced termination per stage | Passed | [Record](windows-cpp-termination.json): exit within 80 ms and device GPU memory back to baseline within 140 ms at load/score/semantic/acoustic/decode; no leftover files; final write phase not probed |
+| C++ multi-architecture CUDA build | Built; RTX 4090 only exercised | [Record](windows-cpp-multiarch.json): sm_75/86/89/120a + compute_120a; ggml-cuda.dll 103.7 MB vs 51.6 MB; identical WAV on the 4090; other architectures untested |
 | Standalone packaging | Not run | Current Python venv is a developer environment; no clean-machine package tested |
 
 The successful transfer recovery is not an app acceptance test. The research
@@ -139,11 +143,57 @@ The first runner attempt failed before inference because it passed relative
 paths to a child running in another directory; that runner defect was fixed and
 its output kept as `.phase0/runs/windows-short-cpp-q8-relative-path-runner-bug`.
 
-These results do not select a production backend. Remaining for this candidate:
-blind listening against the reference, a clean-machine load test with bundled
-MSVC/OpenMP DLLs and cuBLAS loaded by full path from a verified runtime-pack
-directory with no toolkit, a multi-architecture CUDA build decision,
-cancellation/termination probes, and native Linux builds.
+These results do not select a production backend. Follow-up results are below.
+Remaining for this candidate: blind listening against the reference, a clean
+machine without the VC++ redistributable, full-path runtime-pack loading in a
+worker, CUDA architecture coverage on real non-Ada GPUs, and native Linux builds.
+
+## Runtime pack, termination, and CUDA architectures (2026-09-26)
+
+**cuBLAS runtime pack.** The pinned NVIDIA archive (393,706,755 bytes) matched
+its pinned SHA-256. Its 25 entries had no unsafe paths; extracting only
+`cublas64_13.dll`, `cublasLt64_13.dll` and `LICENSE` produced DLLs byte-identical
+to the toolkit copies the tested binaries used, each with a valid NVIDIA
+Authenticode signature. The short fixture then ran with PATH reduced to the pack
+folder and Windows system folders and `CUDA_PATH` removed: no toolkit DLL was
+mapped, cuBLAS came from the pack, and the WAV hash matched the earlier run. The
+MSVC runtime and OpenMP came from System32, because this machine has the VC++
+14.51 redistributable; a clean machine remains untested. PATH isolation is
+weaker than MOD-015's full-path loading: the executable folder and System32 are
+searched first, so the Phase 3 worker must set its DLL search directories itself.
+
+The archive's bundled NVIDIA license lists the CUDA BLAS library as
+distributable with applications and requires that distributable portions be
+accessed only by the application. Whether an app-initiated end-user download
+from NVIDIA fits that grant is recorded as an open review question, not decided.
+
+**Forced termination.** `yue-synth` has no cancellation channel. Killing it with
+`TerminateProcess` after model load started, during score and semantic
+generation, during flow matching, and at decode exited within 80 ms each time.
+Device GPU memory returned to baseline within 140 ms and no compute process
+remained. No output files existed, because outputs are written only after
+decoding. The final write phase writes directly to target paths and was not
+probed; the worker must write to temporary names and promote afterwards.
+
+**CUDA architectures.** A build for `75-real;86-real;89-real;120-real;120-virtual`
+took 509 s and doubled `ggml-cuda.dll` to 103.7 MB (+52 MB, small beside cuBLAS).
+On the RTX 4090 it produced the identical WAV in 14.69 s versus 14.35 s. ggml
+rewrote 120 to the architecture-specific `120a`, so its PTX is not a generic
+fallback for later GPU generations. Turing, Ampere and Blackwell code was
+compiled but never executed here. The supported-GPU list must come from
+measurements on those GPUs, not from the build list.
+
+**Listening review.** `tools/phase0/make-listening-kit.py` wrote blind A/B pairs
+of the retained short and full takes through one WAV writer with equal
+timestamps, a scoring sheet, and a separate key. The project owner listened on
+speakers and rated all four takes pass overall, preferring the C++ Q8 candidate
+for both fixtures. Audible distortion was reported in the reference short take,
+which has no near-full-scale samples, and in the C++ full take, whose three
+over-full-scale samples near 141 s and 144 s are unlikely to explain it alone.
+This is one reviewer and one take per engine; engine and A/B position were
+confounded by the random draw, durations differ, and a question asked with the
+preferences mentioned the C++ overs. It supports keeping the candidate, not a
+final quality bar.
 
 ## Cancellation follow-up (2026-09-26)
 
@@ -197,19 +247,24 @@ OS-denied network test is required for release AC-003/AC-016.
 | --- | --- | --- |
 | P0-01 | Candidate targets and current host recorded | Obtain native Linux and Apple Silicon test access |
 | P0-02 | Source/model pins, Windows Python distribution hashes, and Windows C++ CUDA build/binary hashes recorded | Build-tool lock, Linux/Mac builds, tested profiles for all targets |
-| P0-03 | Windows reference and C++ Q8 short/repeated/full technical runs passed; Q8 acoustic-stage parity recorded | Outputs on other targets; AR parity where applicable; listening comparisons |
-| P0-04 | Timing/memory/output/repeat reports and four callback interruption probes recorded | Measure external-stop/cleanup deadlines, cold caches/temp peaks and remaining failures; agree on quality and latency |
+| P0-03 | Windows reference and C++ Q8 short/repeated/full technical runs passed; Q8 acoustic-stage parity and a first blind listening review recorded | Outputs on other targets; AR parity where applicable; broader listening (more takes/reviewers) and other targets |
+| P0-04 | Timing/memory/output/repeat reports, four reference callback probes, and C++ per-stage forced-termination/GPU-release timing recorded | Final-write interruption, cold caches/temp peaks and remaining failures; agree on quality and latency |
 | P0-05 | Metal-first evaluation order and MPS correctness issue documented | Real Mac Metal test, then measured alternatives only if necessary |
-| P0-06 | [Preliminary dependency/license inventory](dependencies.md); user selected Apache-2.0, applied in LICENSE | Tokenizer terms, approved distribution origins and exact bundled-component notices |
+| P0-06 | [Preliminary dependency/license inventory](dependencies.md); user selected Apache-2.0, applied in LICENSE; cuBLAS pack pinned and verified | Tokenizer terms, NVIDIA end-user download review, approved distribution origins and exact bundled-component notices |
 | P0-07 | .NET 10, Gir.Core 0.8.1 and candidate OS/package baselines recorded | Validate GTK closure/API floor, Mac SDK, and clean-machine packaging path |
 
 All Phase 0 checklist items remain open because each includes work beyond this
 initial evidence. Phase 1 remains unstarted. No unavailable target is waived and
 the three-native-platform/local-generation scope is unchanged.
 
-Next independent work: a recorded blind listening comparison of the saved
-reference and C++ short/full takes (needs a human reviewer); a clean-machine
-load test with cuBLAS from the pinned NVIDIA archive (MOD-015) plus a review of
-NVIDIA's end-user download terms; C++ process termination/cancellation probes;
-and a CUDA architecture-list decision. Native
-Linux and Apple Silicon hardware validation remain explicit open gates.
+Next work, by what it needs:
+
+- A human reviewer, later: more takes and reviewers once other targets produce
+  audio; the first Windows review is recorded.
+- A licensing decision: NVIDIA's terms for app-initiated cuBLAS downloads.
+- Other hardware: a clean Windows machine without the VC++ redistributable;
+  Turing/Ampere/Blackwell GPUs for architecture coverage; native Linux; Apple
+  Silicon for Metal. None of these can be counted as passing until run.
+- Here, independently: the final-write interruption probe and repeated
+  full-song jobs for memory stability. Native Linux and Apple Silicon hardware
+  validation remain explicit open gates.
