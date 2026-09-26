@@ -25,6 +25,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[2]
 BUILD = ROOT / ".phase0/yue2-cpp-build-cuda-sm89"
+ENGINE = "yue-synth.exe" if sys.platform == "win32" else "yue-synth"
 STAGES = [
     ("model-load", "[Load] LM backend"),
     ("score", "[AR] Score 100/"),
@@ -61,7 +62,13 @@ def main():
     parser.add_argument("report", type=Path)
     parser.add_argument("--final-write", action="store_true")
     parser.add_argument("--delays", help="comma-separated millisecond delays for --final-write")
+    parser.add_argument("--build", type=Path, default=BUILD, help="folder containing the yue-synth build")
+    parser.add_argument("--request-json", type=Path, default=ROOT / ".phase0/runs/windows-short-cpp-q8/request.json",
+                        help="converted short request written by run-cpp.py")
+    parser.add_argument("--complete-take", type=Path, default=COMPLETE,
+                        help="a completed run-cpp.py take whose output sizes define 'complete' for --final-write")
     args = parser.parse_args()
+    build = args.build.resolve()
     if args.report.exists():
         raise SystemExit("Refusing to overwrite an existing report")
     work = ROOT / ".phase0/runs" / args.report.stem
@@ -74,14 +81,14 @@ def main():
         if path.stat().st_size != asset["bytes"] or digest(path) != asset["sha256"]:
             raise SystemExit(f"Asset integrity failure: {asset['path']}")
         assets[asset["path"]] = path
-    source = ROOT / ".phase0/runs/windows-short-cpp-q8/request.json"
-    report = {"schemaVersion": 1, "platform": platform.platform(), "binary": digest(BUILD / "yue-synth.exe"),
+    source = args.request_json.resolve()
+    report = {"schemaVersion": 1, "platform": platform.platform(), "binary": digest(build / ENGINE),
               "requestSha256": digest(source), "method": "Popen.kill (TerminateProcess) on first stderr marker",
               "gpuScope": "device-wide nvidia-smi memory.used; released = within 64 MiB of the pre-run baseline",
               "probes": []}
     if args.final_write:
         import soundfile as sf
-        expected = {name: (COMPLETE / name).stat().st_size for name in OUTPUTS}
+        expected = {name: (args.complete_take / name).stat().st_size for name in OUTPUTS}
         report["method"] = "Popen.kill after a fixed delay following the decoder-unload marker, before and during output writes"
         report["expectedSizes"] = expected
         report["trials"] = report.pop("probes")
@@ -89,7 +96,7 @@ def main():
         for delay in delays:
             take = work / f"delay-{delay}ms"
             take.mkdir()
-            command = [str(BUILD / "yue-synth.exe"), "--model", str(assets["YuE2-3B-Q8_0.gguf"]),
+            command = [str(build / ENGINE), "--model", str(assets["YuE2-3B-Q8_0.gguf"]),
                        "--vae", str(assets["YuE2-Vae-F32.gguf"]), "--request", str(source),
                        "--out", str(take / "audio.wav"), "--score", str(take / "score.abc"),
                        "--tokens", str(take / "tokens.csv"), "--latent", str(take / "latent.vae")]
@@ -128,7 +135,7 @@ def main():
     for stage, marker in STAGES:
         take = work / stage
         take.mkdir()
-        command = [str(BUILD / "yue-synth.exe"), "--model", str(assets["YuE2-3B-Q8_0.gguf"]),
+        command = [str(build / ENGINE), "--model", str(assets["YuE2-3B-Q8_0.gguf"]),
                    "--vae", str(assets["YuE2-Vae-F32.gguf"]), "--request", str(source),
                    "--out", str(take / "audio.wav"), "--score", str(take / "score.abc"),
                    "--tokens", str(take / "tokens.csv"), "--latent", str(take / "latent.vae")]

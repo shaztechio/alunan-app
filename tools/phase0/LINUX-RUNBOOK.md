@@ -95,24 +95,17 @@ as Windows):
 | SHA-256 | `1794edb653adf48f5fa02d86bb738ed75888dd355aa39dadb6202d84d554c0dc` |
 
 ```bash
-P=.phase0/runtime-packs/cublas-13.6.0.2-linux-x64 && mkdir -p $P && cd $P
-curl -fL --continue-at - -o archive.tar.xz.incomplete \
-  https://developer.download.nvidia.com/compute/cuda/redist/libcublas/linux-x86_64/libcublas-linux-x86_64-13.6.0.2-archive.tar.xz
-stat -c %s archive.tar.xz.incomplete && sha256sum archive.tar.xz.incomplete   # compare with the table
-mv archive.tar.xz.incomplete libcublas-linux-x86_64-13.6.0.2-archive.tar.xz
-tar -tvJf libcublas-linux-x86_64-13.6.0.2-archive.tar.xz > entries.txt
-cd -
+.phase0/linux-venv/bin/python tools/phase0/prepare-runtime-pack.py --pack cublas-13.6.0.2-linux-x64
 ```
 
-Inspect `entries.txt` for absolute paths, `..`, and links. The archive is
-expected to contain `libcublas.so.13 -> libcublas.so.13.x.y` style symlinks.
-MOD-015 and DATA-FORMATS reject links during extraction, so extract only the
-two real library files by exact name and save them under their sonames
-(`libcublas.so.13`, `libcublasLt.so.13`) in `$P/files/`, plus the `LICENSE`.
-Record each file's size and SHA-256, compare with the toolkit copies under
-`/usr/local/cuda-13.3`, and note the compressed/extracted sizes (the Linux
-archive is larger than the Windows one because it also carries static
-libraries the app never downloads separately; that cost is a finding).
+The tool verifies the archive's size and SHA-256 before opening it, rejects
+unsafe entry names, extracts only the two real library files (the archive's
+`libcublas.so.13 -> libcublas.so.13.6.0.2` symlinks are never followed) under
+their sonames plus `LICENSE`, and checks each against the per-file digests in
+[`runtime-packs.lock.json`](../../docs/validation/phase0/runtime-packs.lock.json),
+pinned on 2026-09-26 from a verified extraction: `libcublas.so.13` 55,354,008
+bytes and `libcublasLt.so.13` 516,598,272 bytes. Compare them with the toolkit
+copies under `/usr/local/cuda-13.3` and record whether they are identical.
 
 ## 6. Models
 
