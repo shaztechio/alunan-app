@@ -20,38 +20,67 @@ procedure, not the app.
    with the audio).
 
 Expect 30–60 minutes, mostly the build. At $0.30–$1 per hour that is about
-$1 or less, plus storage while the pod exists.
+$1 or less, plus storage while the instance exists.
 
-## Deploy (RunPod example; other providers are similar)
+## Start the kit (any provider)
+
+Once you have a shell on the instance, start the kit in the background so a
+dropped connection does not stop it, then follow its log (Ctrl+C stops the
+following, not the run):
+
+```bash
+apt-get update -qq && apt-get install -y -qq curl
+curl -fsSL https://raw.githubusercontent.com/shaztechio/alunan-app/main/tools/phase0/cloud/run-cloud-kit.sh -o run-cloud-kit.sh
+nohup bash run-cloud-kit.sh > kit.out 2>&1 &
+tail -f kit.out
+```
+
+The run is finished when `kit.out` ends with `Done` and names the
+`/workspace/alunan-results-<time>.tar.gz` file. The script creates `/workspace`
+if the image lacks it; set `WORK=<dir>` to use another folder. To test a branch
+that is not merged yet, set `ALUNAN_REF=<branch>`. If the script stops at the
+driver check, the host's driver is too old for CUDA 13: remove the instance and
+choose another host.
+
+## RunPod
 
 1. Create a GPU pod with **1× RTX 5090**.
 2. Use a custom container image: `nvidia/cuda:13.3.1-devel-ubuntu24.04`.
 3. Set container or volume disk to **at least 40 GB**, mounted at `/workspace`.
-4. Start the pod and open its web terminal (or SSH).
-5. Run:
+4. Start the pod, open its web terminal (or SSH), and start the kit as above.
+5. Download the results with the pod's file browser, `scp`, or `runpodctl send`.
+6. **Stop and delete the pod** and any attached volume; a stopped pod can still
+   bill for storage.
+
+## Vast.ai
+
+1. Add your SSH public key to your Vast account (Account, SSH keys). SSH is the
+   most dependable way into a custom image; Jupyter or web-terminal modes may
+   not work with a bare CUDA image.
+2. Search for **1× RTX 5090** and filter or sort by the host's listed
+   **Max CUDA: choose 13.3 or higher**. The `nvidia/cuda:13.3.1` image can refuse
+   to start on a host whose driver supports an older CUDA, before the script's
+   own driver check can run.
+3. Choose **on-demand**, not interruptible (bid) pricing, so the 30–60 minute
+   run is not stopped midway. Prefer verified hosts with high reliability.
+4. In the template, set the image to `nvidia/cuda:13.3.1-devel-ubuntu24.04`,
+   the launch mode to **SSH**, and the disk to **at least 40 GB**. Disk size is
+   fixed when the instance is created.
+5. Rent it, then connect with the SSH command from the instance's **Connect**
+   button (it includes a non-standard port) and start the kit as above.
+6. From a terminal on your PC, copy the results using that port and address:
 
    ```bash
-   apt-get update -qq && apt-get install -y -qq curl
-   curl -fsSL https://raw.githubusercontent.com/shaztechio/alunan-app/main/tools/phase0/cloud/run-cloud-kit.sh -o run-cloud-kit.sh
-   bash run-cloud-kit.sh
+   scp -P <port> root@<address>:/workspace/alunan-results-*.tar.gz .
    ```
 
-On Vast.ai, choose the same image, 40 GB of disk, and an instance whose listed
-driver is 580 or newer; if `/workspace` does not exist, run with
-`WORK=/root bash run-cloud-kit.sh`. To test a branch that is not merged yet,
-set `ALUNAN_REF=<branch>`.
+7. **Destroy the instance.** A stopped Vast instance keeps billing for its disk
+   until it is destroyed.
 
-If the script stops at the driver check, the host's driver is too old for CUDA
-13: delete the pod and choose another host.
+## Get the results to Claude
 
-## Get the results, then stop billing
-
-Download the `.tar.gz` with the provider's file browser, `scp` over SSH, or
-RunPod's `runpodctl send`. Put it anywhere on your PC and tell Claude where it
-is; the Phase 0 records are written from it in a PR.
-
-Then **stop and delete the pod** (and any attached volume). A stopped pod can
-still bill for storage.
+Put the `.tar.gz` anywhere on your PC and tell Claude where it is; the Phase 0
+records are written from it in a PR.
 
 ## What this does and does not prove
 
