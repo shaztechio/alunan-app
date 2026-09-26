@@ -245,7 +245,9 @@ Work:
   engine patches minimal, pinned, and documented.
 - [ ] P3-02 Pass verified local asset paths and the frozen request to the worker.
   Disable implicit model downloads, dependency installation, and remote code
-  loading. Reject unsupported profile/engine combinations before model load.
+  loading. Reject unsupported profile/engine combinations before model load, and
+  confirm every required model file is present before launch: Phase 0 found that
+  yue2.cpp only opens the decoder after generation.
 - [ ] P3-03 Implement process supervision in C# and Swift: hidden launch, handshake,
   separate diagnostics, crash detection, shutdown, and cleanup on parent exit.
   Select and test OS-specific lifetime controls for child processes. Load GPU
@@ -258,6 +260,9 @@ Work:
 - [ ] P3-05 Normalize stage events and errors without fabricating progress. Distinguish
   an engine error, out-of-memory failure, user cancellation, and truncated output.
   Discard stale events by job ID and release model resources after a job.
+  Stage outputs under temporary names and promote them only after a clean exit
+  and an explicit success message; then apply the GEN-010 audio checks, because
+  corrupt weights can yield a successful exit with silent audio.
 - [ ] P3-06 Implement the application coordinator: validate -> snapshot -> preflight
   -> prepare models -> load -> generate -> finalize take. Save audio and metadata
   before reporting success; interrupted writes remain identifiable and recoverable.
