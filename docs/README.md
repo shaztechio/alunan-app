@@ -24,18 +24,23 @@ JavaScript.
 
 Only the deploy job has Pages write permission. Bunyi's release-version
 rendering, release-refresh dispatch, and README badges are omitted because
-Alunan has no releases. Add them (with tests) when the first installers ship.
+Alunan has no releases. Add them (with tests) when the first installers ship,
+following the Releases section of [`AGENTS.md`](../AGENTS.md).
 
 ## Custom domain
 
-`CNAME` claims **alunan.app**. It takes effect once DNS points at GitHub Pages:
-apex `A` records to `185.199.108.153`, `185.199.109.153`, `185.199.110.153`,
-`185.199.111.153` (plus the `AAAA` equivalents `2606:50c0:8000::153`,
-`2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153`), and a `www`
-`CNAME` to `shaztechio.github.io`. Verify the domain under the organization's
-Pages settings to prevent takeover, then enable **Enforce HTTPS** once the
-certificate is issued. Until DNS resolves, the site is at
-`https://shaztechio.github.io/alunan-app/`.
+Configured on 2026-09-26. Repository Pages settings use GitHub Actions as the
+source, the custom domain `alunan.app`, and enforced HTTPS; the `github-pages`
+environment deploys only from `main`. With Actions deployments the repository
+setting is authoritative; `CNAME` keeps the builder and settings in step.
+
+Cloudflare DNS for alunan.app, all records DNS-only (not proxied) so GitHub can
+issue and renew its certificate: apex `A` records to `185.199.108.153`,
+`185.199.109.153`, `185.199.110.153`, `185.199.111.153`; apex `AAAA` records to
+`2606:50c0:8000::153` through `2606:50c0:8003::153`; `www` `CNAME` to
+`shaztechio.github.io`; and the `_github-pages-challenge-shaztechio` TXT record
+that keeps alunan.app verified for the shaztechio organization. Do not proxy
+these records or add a wildcard record.
 
 ## Local preview
 
