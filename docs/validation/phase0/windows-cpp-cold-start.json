@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "platform": "Windows-11-10.0.26200-SP0",
+  "binary": "d933ce730decc293f1c348cf4744860a57aa3d7d12aaa1a3924990f5e17c1709",
+  "method": "robocopy /J (unbuffered) copies of the pinned GGUFs; cold run on the copies, then a warm repeat",
+  "ioScope": "psutil io_counters sampled every 50 ms until exit; includes model reads and output writes",
+  "copySeconds": 3.258019700006116,
+  "cold": {
+    "label": "cold",
+    "exitCode": 0,
+    "processSeconds": 15.997006799996598,
+    "loadMs": {
+      "LM": 2141,
+      "NAR": 1275,
+      "VAE": 602
+    },
+    "processReadBytesAtLastSample": 31320097,
+    "processWriteBytesAtLastSample": 25497226,
+    "outputBytes": 25492406,
+    "newTempFiles": 0,
+    "newTempBytes": 0,
+    "wavSha256": "7c7025c597fee071e0c4b40d6a8915d4e1bd384ccc4375db4b6c319a31adadca"
+  },
+  "warm": {
+    "label": "warm",
+    "exitCode": 0,
+    "processSeconds": 13.983683800004655,
+    "loadMs": {
+      "LM": 995,
+      "NAR": 579,
+      "VAE": 481
+    },
+    "processReadBytesAtLastSample": 31237860,
+    "processWriteBytesAtLastSample": 25497224,
+    "outputBytes": 25492406,
+    "newTempFiles": 1,
+    "newTempBytes": 0,
+    "wavSha256": "7c7025c597fee071e0c4b40d6a8915d4e1bd384ccc4375db4b6c319a31adadca"
+  },
+  "copiesMatchPins": true,
+  "status": "measured",
+  "observedAt": "2026-09-26",
+  "fixture": "tools/phase0/requests/short.json",
+  "findings": [
+    "Uncached model files added about 2 s to a 14 s short job on this NVMe drive: generator load 2141 ms vs 995 ms, acoustic model 1275 ms vs 579 ms, decoder 602 ms vs 481 ms",
+    "The engine memory-maps its GGUFs, so process read counters (about 31 MB) do not capture model reads",
+    "Process writes equal the outputs (about 25.5 MB for the short fixture) and no temporary files were created: peak temporary disk for yue-synth is its output set",
+    "The robocopy /J copy ran at about 1.3 GB/s; slower disks will lengthen cold loads proportionally and were not measured"
+  ],
+  "limitations": [
+    "Unbuffered copies approximate a cold cache without flushing the standby list; the doubled load times indicate the copies were uncached",
+    "One cold and one warm run; NVMe only",
+    "A 0-byte file appeared under TEMP during the warm run; no yue-synth write accounts for it, so it is attributed to other activity"
+  ]
+}
