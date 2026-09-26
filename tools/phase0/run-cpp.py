@@ -74,8 +74,9 @@ def main():
     parser.add_argument("--build", type=Path, default=DEFAULT_BUILD)
     parser.add_argument("--repeat", type=int, default=1, help="separate yue-synth processes")
     parser.add_argument("--runtime-dir", type=Path,
-                        help="run with PATH reduced to this directory plus Windows system folders and "
-                             "CUDA_PATH* removed; records the DLL paths the process maps")
+                        help="Windows: PATH reduced to this directory plus system folders and CUDA_PATH* removed. "
+                             "Linux: LD_LIBRARY_PATH set to this directory only and CUDA_PATH*/CUDA_HOME removed. "
+                             "Records the shared libraries the process maps")
     args = parser.parse_args()
     if args.repeat < 1:
         parser.error("--repeat must be positive")
@@ -112,13 +113,19 @@ def main():
         request_path.write_text(json.dumps(effective, indent=2) + "\n", encoding="utf-8")
         report["effectiveRequest"] = effective
         environment = None
-        if args.runtime_dir:
+        if args.runtime_dir and WINDOWS:
             system = Path(os.environ["SystemRoot"])
             search = [args.runtime_dir.resolve(), system / "System32", system, system / "System32/Wbem"]
             environment = {k: v for k, v in os.environ.items() if not k.upper().startswith("CUDA_PATH")}
             environment["PATH"] = os.pathsep.join(str(d) for d in search)
             report["environment"] = {"PATH": [str(d) for d in search], "removed": sorted(
                 k for k in os.environ if k.upper().startswith("CUDA_PATH"))}
+        elif args.runtime_dir:
+            drop = [k for k in os.environ if k.upper().startswith("CUDA_PATH") or k in ("CUDA_HOME", "LD_LIBRARY_PATH")]
+            environment = {k: v for k, v in os.environ.items() if k not in drop}
+            environment["LD_LIBRARY_PATH"] = str(args.runtime_dir.resolve())
+            report["environment"] = {"LD_LIBRARY_PATH": environment["LD_LIBRARY_PATH"], "removed": sorted(drop),
+                                     "note": "RPATH and the ldconfig cache can still resolve libraries; check loadedLibraries"}
         save_json(args.output / "benchmark.json", report)
 
         for index in range(args.repeat):
@@ -152,7 +159,8 @@ def main():
                             peaks["system"] = max(peaks["system"], psutil.virtual_memory().used)
                         if args.runtime_dir and ticks % 10 == 0:
                             try:
-                                modules.update(m.path for m in proc.memory_maps() if m.path.lower().endswith(".dll"))
+                                modules.update(m.path for m in proc.memory_maps()
+                                               if m.path.lower().endswith((".dll", ".so", ".dylib")) or ".so." in m.path)
                             except psutil.Error:
                                 pass
 
@@ -172,7 +180,8 @@ def main():
                    "truncated": "(truncated)" in text, "listeningReview": "not performed"}
             if args.runtime_dir:
                 run["loadedDlls"] = sorted(modules, key=str.lower)
-                run["toolkitDllsLoaded"] = sorted(m for m in modules if "nvidia gpu computing toolkit" in m.lower())
+                run["toolkitDllsLoaded"] = sorted(m for m in modules if "nvidia gpu computing toolkit" in m.lower()
+                                                  or "/cuda" in m.lower() or "/usr/local/cuda" in m.lower())
             report["runs"].append(run)
             save_json(args.output / "benchmark.json", report)
             if code != 0:

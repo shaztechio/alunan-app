@@ -187,6 +187,7 @@ GGUFs and run the script there.
 ## Other platforms
 
 [`MACOS-RUNBOOK.md`](MACOS-RUNBOOK.md) is the step-by-step procedure for the
-Apple Silicon Mac evaluation. `prepare-models.py` is a cross-platform
+Apple Silicon Mac evaluation. [`LINUX-RUNBOOK.md`](LINUX-RUNBOOK.md) covers native
+Ubuntu 24.04 with NVIDIA CUDA (and a Linux RTX 5090 cloud container). `prepare-models.py` is a cross-platform
 equivalent of `prepare-models.ps1`, and `run-cpp.py` runs on macOS and Linux as
 well as Windows (engine name, library hashing, and memory sampling adapt).
