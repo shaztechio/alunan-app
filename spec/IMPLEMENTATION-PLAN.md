@@ -144,11 +144,12 @@ license inventory, provisional support matrix, and frozen candidate model profil
 Progress, 2026-09-26: source/model candidates and a Windows reference dependency
 environment are pinned; fixed requests and a local benchmark runner are present.
 Windows eager-reference short/repeated/full runs passed technical checks; the
-default backend's flash-attention failure is recorded. Listening and candidate
-comparisons remain open. WSL is an auxiliary Linux environment, not native
-Linux qualification. The user confirmed no Mac is currently available. All P0
-checkboxes stay open until their full cross-platform deliverables are satisfied;
-see the [evidence ledger](../docs/validation/phase0/README.md).
+default backend's flash-attention failure is recorded. The pinned C++ Q8 CUDA
+candidate built and passed the same Windows technical checks, with acoustic-stage
+parity recorded. Listening comparisons remain open. WSL is an auxiliary Linux
+environment, not native Linux qualification. The user confirmed no Mac is
+currently available. All P0 checkboxes stay open until their full cross-platform
+deliverables are satisfied; see the [evidence ledger](../docs/validation/phase0/README.md).
 
 **Exit gate:** each target has a complete local generation and a credible bundled
 runtime path, with measured limits recorded. This supplies preliminary AC-016

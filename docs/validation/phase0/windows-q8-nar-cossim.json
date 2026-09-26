@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-informational",
+  "harness": "yue2.cpp tests/debug-nar-cossim.py at f17d526, unmodified, GGML_BACKEND=CUDA0, fusion enabled",
+  "quant": "Q8_0",
+  "decoder": "YuE2-Vae-F32.gguf",
+  "pythonReference": "installed yue2-infer 0.1.6 (hash-verified source), official BF16 checkpoint loaded as float32 on CUDA",
+  "fixture": {
+    "path": "tests/request0.json (upstream)",
+    "sha256": "1e66647d1e9fdb6907ec9ba994e388f113c1443593ba3567e4d87ef9f1ca69f0",
+    "note": "Upstream fixture with supplied score and semantic stream; not a Lagu fixture"
+  },
+  "scope": "Shared AR sequence and initial noise isolate prefill, 32-step flow matching and VAE decode. AR logits/sampling (LM parity) not run: upstream harness targets a BF16 GGUF outside the pinned Q8 profile.",
+  "cosine": {
+    "nar_step0_first": 0.999955,
+    "nar_step0_second": 0.999955,
+    "nar_step0_xt": 1.0,
+    "nar_step5_first": 0.999938,
+    "nar_step5_second": 0.999934,
+    "nar_step5_xt": 0.999999,
+    "nar_step10_first": 0.999887,
+    "nar_step10_second": 0.999883,
+    "nar_step10_xt": 0.999992,
+    "nar_step15_first": 0.99983,
+    "nar_step15_second": 0.999823,
+    "nar_step15_xt": 0.999969,
+    "nar_step20_first": 0.999779,
+    "nar_step20_second": 0.999774,
+    "nar_step20_xt": 0.999934,
+    "nar_step25_first": 0.999693,
+    "nar_step25_second": 0.999681,
+    "nar_step25_xt": 0.999905,
+    "nar_step30_first": 0.99968,
+    "nar_step30_second": 0.999722,
+    "nar_step30_xt": 0.999889,
+    "nar_step31_first": 0.999757,
+    "nar_step31_second": 0.999782,
+    "nar_x0": 0.999888
+  },
+  "vaeAudioStftCosine": 0.999957,
+  "errorGrowth": [
+    "nar_step0_xt: cos 1.000000, max_err 0.001486, mean_err 0.000279, mean_A -0.000277, std_A 0.974452, mean_B -0.000294, std_B 0.974478",
+    "nar_step5_xt: cos 0.999999, max_err 0.020215, mean_err 0.001084, mean_A -0.005973, std_A 0.839857, mean_B -0.006036, std_B 0.840059",
+    "nar_step10_xt: cos 0.999992, max_err 0.097591, mean_err 0.002141, mean_A -0.011872, std_A 0.748363, mean_B -0.011949, std_B 0.748644",
+    "nar_step15_xt: cos 0.999969, max_err 0.230516, mean_err 0.003444, mean_A -0.018108, std_A 0.716021, mean_B -0.018176, std_B 0.716272",
+    "nar_step20_xt: cos 0.999934, max_err 0.392684, mean_err 0.004923, mean_A -0.024452, std_A 0.750554, mean_B -0.024477, std_B 0.750742",
+    "nar_step25_xt: cos 0.999905, max_err 0.549383, mean_err 0.006520, mean_A -0.030690, std_A 0.843782, mean_B -0.030681, std_B 0.843886",
+    "nar_step30_xt: cos 0.999889, max_err 0.675431, mean_err 0.008158, mean_A -0.036544, std_A 0.979735, mean_B -0.036508, std_B 0.979798"
+  ],
+  "upstreamPublishedReference": {
+    "device": "RTX PRO 6000 Blackwell (Linux)",
+    "nar_step30_xt": 0.999884,
+    "vaeAudioStftCosine": 0.999954
+  },
+  "harnessAdaptation": "Windows layout only: extensionless hard link build/yue-synth -> yue-synth.exe; models/checkpoints hard-linked to verified caches; modeling_vae.py copied from the verified installed package"
+}
