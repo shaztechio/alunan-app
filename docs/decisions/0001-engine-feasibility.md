@@ -138,9 +138,15 @@ These values come from NVIDIA's published `redistrib_13.3.1.json`. The Windows
 archive was downloaded and verified on 2026-09-26: its DLLs are byte-identical to
 the tested toolkit copies, NVIDIA-signed, and run the engine with the toolkit
 absent from the environment ([record](../validation/phase0/windows-runtime-pack.json)).
-Still required before Phase 0 closes: full-path loading from a worker, and a
-review of whether NVIDIA's terms permit the app to fetch the archive for the
-user and which notices to show. The Linux archive is larger than
+**Terms decision (2026-09-26):** the project owner reviewed NVIDIA's terms and
+accepted the reading that the app may fetch the pinned redistributable archive
+for the user. This is the owner's own reading, not a legal opinion or NVIDIA
+confirmation. No technical gate was found: the redistributable manifest and the
+archive download over plain HTTPS without sign-in, token, or click-through. If
+NVIDIA later adds a gate, the fallback must be reconsidered in FEATURES.md first;
+sending users to install a toolkit themselves conflicts with APP-002. The app
+shows NVIDIA's bundled license (the archive's `LICENSE`) with the pack (MOD-015).
+Still required before Phase 0 closes: full-path loading from a worker. The Linux archive is larger than
 the Windows DLLs because it includes static libraries; that user-visible cost
 is recorded rather than avoided. If the terms review fails, return to FEATURES.md
 before choosing another distribution method.
