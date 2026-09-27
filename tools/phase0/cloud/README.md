@@ -36,7 +36,11 @@ tail -f kit.out
 ```
 
 The run is finished when `kit.out` ends with `Done` and names the
-`/workspace/alunan-results-<time>.tar.gz` file. The script creates `/workspace`
+`/workspace/alunan-results-<time>.tar.gz` file. For scripted watching, read
+`/workspace/alunan-kit.status`: `running`, `done`, or `failed <exit code>`
+(`alunan-kit.result` then holds the archive path). Do not detect completion
+with `pgrep -f run-cloud-kit.sh` from an SSH command: the command's own text
+matches the pattern, so the check never reports the kit as stopped. The script creates `/workspace`
 if the image lacks it; set `WORK=<dir>` to use another folder. To test a branch
 that is not merged yet, set `ALUNAN_REF=<branch>`. If the script stops at the
 driver check, the host's driver is too old for CUDA 13: remove the instance and

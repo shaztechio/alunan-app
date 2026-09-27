@@ -67,6 +67,31 @@
         }
       ],
       "note": "Per-file digests pinned 2026-09-26 from a verified extraction on Windows (Python tarfile); symlinks in the archive were not extracted"
+    },
+    {
+      "id": "cudart-13.3.29-linux-x64",
+      "platform": "linux-x86_64",
+      "format": "tar.xz",
+      "url": "https://developer.download.nvidia.com/compute/cuda/redist/cuda_cudart/linux-x86_64/cuda_cudart-linux-x86_64-13.3.29-archive.tar.xz",
+      "bytes": 1573744,
+      "sha256": "1e59c4888267d27ba1a9bd0f3669a6439db1334a96e754cd9013c7c73e18dc9d",
+      "files": [
+        {
+          "memberPattern": "^cuda_cudart-linux-x86_64-13\\.3\\.29-archive/lib/libcudart\\.so\\.13\\.[0-9.]+$",
+          "name": "libcudart.so.13",
+          "bytes": 782080,
+          "sha256": "9f92e4c3f7e14d0fed69ef876a45d4255a2dc88cb552a673a90ce881c26282fe",
+          "observedMember": "cuda_cudart-linux-x86_64-13.3.29-archive/lib/libcudart.so.13.3.29"
+        },
+        {
+          "member": "cuda_cudart-linux-x86_64-13.3.29-archive/LICENSE",
+          "name": "LICENSE.txt",
+          "bytes": 68070,
+          "sha256": "088381bc2d891e719a2a9398645b00bb45f3b24231473a8283ac7e3e66b8a028",
+          "observedMember": "cuda_cudart-linux-x86_64-13.3.29-archive/LICENSE"
+        }
+      ],
+      "note": "Needed on Linux only: the Linux yue2.cpp build links the CUDA runtime dynamically (Windows links it statically). Same redistrib_13.3.1.json manifest. Per-file digests pinned 2026-09-26 from a verified extraction; the RTX 5090 run loaded this same libcudart.so.13.3.29 from the toolkit."
     }
   ]
 }

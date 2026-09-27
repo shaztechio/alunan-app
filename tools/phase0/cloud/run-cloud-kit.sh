@@ -16,6 +16,10 @@ RESULTS="$WORK/alunan-results-$STAMP"
 mkdir -p "$RESULTS"
 exec > >(tee -a "$RESULTS/kit.log") 2>&1
 step() { echo; echo "=== $(date -u +%H:%M:%S) $*"; }
+# One status file for anything watching the run: "done" or "failed <exit code>".
+STATUS="$WORK/alunan-kit.status"
+echo running > "$STATUS"
+trap 'code=$?; if [ $code -eq 0 ]; then echo done > "$STATUS"; else echo "failed $code" > "$STATUS"; fi' EXIT
 SUDO=""; [ "$(id -u)" -ne 0 ] && SUDO=sudo
 
 step "Preflight"
@@ -83,9 +87,14 @@ cat "$RESULTS/build.txt"
 step "Models (4.34 GB, verified)"
 $PY tools/phase0/prepare-models.py --profile yue2-cpp-q8
 
-step "NVIDIA Linux cuBLAS runtime pack (818 MB, verified)"
+step "NVIDIA Linux runtime packs: cuBLAS (818 MB) and CUDA runtime (1.6 MB), verified"
 $PY tools/phase0/prepare-runtime-pack.py --pack cublas-13.6.0.2-linux-x64 | tee "$RESULTS/runtime-pack.json"
-PACK=$PWD/.phase0/runtime-packs/cublas-13.6.0.2-linux-x64/files
+$PY tools/phase0/prepare-runtime-pack.py --pack cudart-13.3.29-linux-x64 | tee "$RESULTS/runtime-pack-cudart.json"
+# The Linux build links libcudart dynamically, so the app's Linux runtime folder
+# carries both packs' libraries.
+PACK=$PWD/.phase0/runtime-packs/linux-gpu-runtime
+rm -rf "$PACK" && mkdir -p "$PACK"
+cp .phase0/runtime-packs/cublas-13.6.0.2-linux-x64/files/*.so.* .phase0/runtime-packs/cudart-13.3.29-linux-x64/files/*.so.* "$PACK/"
 
 RUNS=.phase0/runs
 step "Short song, two processes"
@@ -94,7 +103,7 @@ step "Full song"
 $PY tools/phase0/run-cpp.py --build "$B" --request tools/phase0/requests/full.json --output $RUNS/cloud-full
 step "Full song, three more processes"
 $PY tools/phase0/run-cpp.py --build "$B" --request tools/phase0/requests/full.json --output $RUNS/cloud-full-repeat3 --repeat 3
-step "Short song with only the downloaded cuBLAS on the library path"
+step "Short song with only the downloaded NVIDIA libraries on the library path"
 $PY tools/phase0/run-cpp.py --build "$B" --request tools/phase0/requests/short.json --output $RUNS/cloud-short-runtime-pack --runtime-dir "$PACK"
 step "Termination at five stages"
 $PY tools/phase0/probe-cpp-termination.py --build "$B" --request-json $RUNS/cloud-short/request.json $RUNS/cloud-termination.json
@@ -106,7 +115,9 @@ step "Packing results"
 cp -r $RUNS/cloud-short $RUNS/cloud-full $RUNS/cloud-full-repeat3 $RUNS/cloud-short-runtime-pack "$RESULTS/"
 cp $RUNS/cloud-termination.json $RUNS/cloud-final-write.json "$RESULTS/"
 cp .phase0/runtime-packs/cublas-13.6.0.2-linux-x64/files.json "$RESULTS/runtime-pack-files.json"
+cp .phase0/runtime-packs/cudart-13.3.29-linux-x64/files.json "$RESULTS/runtime-pack-cudart-files.json"
 tar -czf "$RESULTS.tar.gz" -C "$WORK" "$(basename "$RESULTS")"
 ls -lh "$RESULTS.tar.gz"
 echo
 echo "Done. Download $RESULTS.tar.gz, then STOP and DELETE the pod so billing ends."
+echo "$RESULTS.tar.gz" > "$WORK/alunan-kit.result"

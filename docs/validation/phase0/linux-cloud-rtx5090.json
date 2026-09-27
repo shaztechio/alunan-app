@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "status": "passed-technical-checks-listening-pending",
+  "observedAt": "2026-09-27",
+  "environment": {
+    "kind": "Rented cloud container (Vast.ai, Spain host, on-demand), not a native desktop",
+    "image": "nvidia/cuda:13.3.1-devel-ubuntu24.04",
+    "gpu": "NVIDIA GeForce RTX 5090, 610.57.04, 32607 MiB, 12.0",
+    "cpu": "AMD EPYC 7B12, 32 vCPU allocated",
+    "cost": "USD 0.44 for the whole session including one aborted run and 15 idle minutes",
+    "kit": "tools/phase0/cloud/run-cloud-kit.sh at alunan-app commit ac9250d (first attempt) and a5e7b6b (completed run)"
+  },
+  "build": {
+    "toolchain": "nvcc 13.3.73 (CUDA 13.3.1), gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "architectures": "75-real;86-real;89-real;120-real;120-virtual",
+    "buildSeconds": 305,
+    "engineVersion": "yue2.cpp f17d526 (2026-09-24)",
+    "glibcFloor": "GLIBC_2.38",
+    "binariesSha256": {
+      "yue-synth": "797588dc8d77b75096fc3e516378374039beaa2688951ae1f1c9c4d81e78e795",
+      "libggml-base.so": "314b5634cecec3584ad8fe8eacc6dd6e3d1b30fd8b08190a746fc5cdce7cfc7f",
+      "libggml-cpu.so": "302611e41eb2e3e46420d745e820364959fe7e7c1757973602c5478a5cbd8cbb",
+      "libggml-cuda.so": "951c0568fef5dc6952fbc442ef9d7971789e6234941f551f1ede438008f257ad",
+      "libggml.so": "c682a650ff531bfb26d146590b5b7a209a81c36ac57e7e80455655d6c74a7d3c"
+    },
+    "runpath": "absolute path of the build folder; a package needs an $ORIGIN-relative RUNPATH",
+    "dynamicNvidiaLibraries": [
+      "libcublas.so.13",
+      "libcublasLt.so.13",
+      "libcudart.so.13"
+    ]
+  },
+  "runs": {
+    "short": [
+      {
+        "index": 1,
+        "exitCode": 0,
+        "processSeconds": 8.53979330509901,
+        "audioSeconds": 45.998666666666665,
+        "sampleRate": 48000,
+        "channels": 2,
+        "finiteNonSilentAudio": true,
+        "truncated": false,
+        "peakRssBytes": 2417537024,
+        "peakGpuUsedAboveBaselineBytes": 5790236672,
+        "wavSha256": "f9594ee805cb5e316f67ebf92fe90c343c827ec1a018cc38b6015c51544ace6d"
+      },
+      {
+        "index": 2,
+        "exitCode": 0,
+        "processSeconds": 8.635497216135263,
+        "audioSeconds": 45.998666666666665,
+        "sampleRate": 48000,
+        "channels": 2,
+        "finiteNonSilentAudio": true,
+        "truncated": false,
+        "peakRssBytes": 2577793024,
+        "peakGpuUsedAboveBaselineBytes": 5790236672,
+        "wavSha256": "f9594ee805cb5e316f67ebf92fe90c343c827ec1a018cc38b6015c51544ace6d"
+      }
+    ],
+    "full": [
+      {
+        "index": 1,
+        "exitCode": 0,
+        "processSeconds": 30.306474667042494,
+        "audioSeconds": 169.95866666666666,
+        "sampleRate": 48000,
+        "channels": 2,
+        "finiteNonSilentAudio": true,
+        "truncated": false,
+        "peakRssBytes": 1879252992,
+        "peakGpuUsedAboveBaselineBytes": 5949620224,
+        "wavSha256": "65dbcab12cc8ab33d345746d3834adf7b5e70bb4a76e37bbbbcfdc232a20d117"
+      },
+      {
+        "index": 1,
+        "exitCode": 0,
+        "processSeconds": 30.421569772064686,
+        "audioSeconds": 169.95866666666666,
+        "sampleRate": 48000,
+        "channels": 2,
+        "finiteNonSilentAudio": true,
+        "truncated": false,
+        "peakRssBytes": 2399621120,
+        "peakGpuUsedAboveBaselineBytes": 5949620224,
+        "wavSha256": "65dbcab12cc8ab33d345746d3834adf7b5e70bb4a76e37bbbbcfdc232a20d117"
+      },
+      {
+        "index": 2,
+        "exitCode": 0,
+        "processSeconds": 30.302797351032495,
+        "audioSeconds": 169.95866666666666,
+        "sampleRate": 48000,
+        "channels": 2,
+        "finiteNonSilentAudio": true,
+        "truncated": false,
+        "peakRssBytes": 1881686016,
+        "peakGpuUsedAboveBaselineBytes": 5949620224,
+        "wavSha256": "65dbcab12cc8ab33d345746d3834adf7b5e70bb4a76e37bbbbcfdc232a20d117"
+      },
+      {
+        "index": 3,
+        "exitCode": 0,
+        "processSeconds": 30.17359297722578,
+        "audioSeconds": 169.95866666666666,
+        "sampleRate": 48000,
+        "channels": 2,
+        "finiteNonSilentAudio": true,
+        "truncated": false,
+        "peakRssBytes": 1915813888,
+        "peakGpuUsedAboveBaselineBytes": 5949620224,
+        "wavSha256": "65dbcab12cc8ab33d345746d3834adf7b5e70bb4a76e37bbbbcfdc232a20d117"
+      }
+    ]
+  },
+  "runtimePackRun": {
+    "libraryPath": "LD_LIBRARY_PATH = extracted cuBLAS pack only; CUDA_HOME/CUDA_PATH removed",
+    "wavSha256": "f9594ee805cb5e316f67ebf92fe90c343c827ec1a018cc38b6015c51544ace6d",
+    "identicalToNormalShortRun": true,
+    "nvidiaLibrariesLoaded": [
+      "libcublas.so.13 (pack)",
+      "libcublasLt.so.13 (pack)",
+      "libcudart.so.13.3.29 (toolkit)"
+    ],
+    "toolkitLibrariesLoaded": [
+      "libcudart.so.13.3.29"
+    ]
+  },
+  "termination": [
+    {
+      "stage": "model-load",
+      "exitSeconds": 0.0520956851541996,
+      "gpuReleasedSeconds": 0.1439281404018402,
+      "processStillOnGpu": false,
+      "filesLeft": {}
+    },
+    {
+      "stage": "score",
+      "exitSeconds": 0.13138002529740334,
+      "gpuReleasedSeconds": 0.198163740336895,
+      "processStillOnGpu": false,
+      "filesLeft": {}
+    },
+    {
+      "stage": "semantic",
+      "exitSeconds": 0.12642647698521614,
+      "gpuReleasedSeconds": 0.1964379884302616,
+      "processStillOnGpu": false,
+      "filesLeft": {}
+    },
+    {
+      "stage": "acoustic",
+      "exitSeconds": 0.1356668546795845,
+      "gpuReleasedSeconds": 0.18431584164500237,
+      "processStillOnGpu": false,
+      "filesLeft": {}
+    },
+    {
+      "stage": "decode",
+      "exitSeconds": 0.13234680891036987,
+      "gpuReleasedSeconds": 0.17797046899795532,
+      "processStillOnGpu": false,
+      "filesLeft": {}
+    }
+  ],
+  "finalWrite": [
+    {
+      "delayMs": 0,
+      "exitCode": -9,
+      "files": []
+    },
+    {
+      "delayMs": 1,
+      "exitCode": -9,
+      "files": []
+    },
+    {
+      "delayMs": 2,
+      "exitCode": -9,
+      "files": []
+    },
+    {
+      "delayMs": 5,
+      "exitCode": -9,
+      "files": []
+    },
+    {
+      "delayMs": 10,
+      "exitCode": -9,
+      "files": []
+    },
+    {
+      "delayMs": 20,
+      "exitCode": -9,
+      "files": []
+    },
+    {
+      "delayMs": 40,
+      "exitCode": -9,
+      "files": [
+        "latent.vae",
+        "score.abc",
+        "tokens.csv"
+      ]
+    },
+    {
+      "delayMs": 80,
+      "exitCode": 0,
+      "files": [
+        "audio.json",
+        "audio.wav",
+        "latent.vae",
+        "score.abc",
+        "tokens.csv"
+      ]
+    },
+    {
+      "delayMs": 160,
+      "exitCode": 0,
+      "files": [
+        "audio.json",
+        "audio.wav",
+        "latent.vae",
+        "score.abc",
+        "tokens.csv"
+      ]
+    }
+  ],
+  "findings": [
+    "The multi-architecture build's sm_120a code runs on a real RTX 5090 (Blackwell): every run completed, finite, non-silent, 48 kHz stereo, not truncated",
+    "Short song 8.5 s and full song 30.2-30.4 s (four runs), versus 14.3 s and 37.7 s on the Windows RTX 4090; peak GPU use above idle 5.4-5.5 GB",
+    "Outputs are identical across processes on Linux, but the Linux short take is a different rendition (46.0 s of audio) from Windows (66.4 s) with the same seed; FEATURES.md already allows backend differences",
+    "cuBLAS loaded only from the pinned NVIDIA pack, but libcudart.so.13.3.29 still came from the toolkit: the Linux build links the CUDA runtime dynamically, unlike Windows. The Linux runtime folder therefore also needs libcudart, now pinned as cudart-13.3.29-linux-x64 (1.6 MB archive)",
+    "The engine's RUNPATH is the absolute build folder; packaging must set an $ORIGIN-relative RUNPATH",
+    "Forced termination exited within 0.14 s at every stage and released GPU memory within 0.2 s with no leftover files",
+    "Final-write sweep: kills up to 40 ms left no WAV (at most the three small files); runs at 80 ms and later had already finished. No truncated WAV was captured on Linux this time",
+    "First attempt stopped after a successful build because yue-synth --help exits 1 under set -e; fixed in the kit (PR #17) and rerun reusing the build"
+  ],
+  "limitations": [
+    "Cloud container, not a native Ubuntu desktop: GTK, packaging, and desktop behavior are not covered",
+    "A watcher bug (pgrep matching its own SSH command) left the finished instance idle about 15 minutes; the kit now writes /workspace/alunan-kit.status",
+    "Not listened to"
+  ]
+}
