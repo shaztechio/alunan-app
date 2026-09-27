@@ -318,7 +318,7 @@ OS-denied network test is required for release AC-003/AC-016.
 | P0-03 | Windows reference and C++ Q8 runs passed; Linux C++ Q8 runs passed on a cloud RTX 5090; Q8 acoustic-stage parity and a first blind listening review recorded | Native Linux desktop and Mac outputs; AR parity where applicable; broader listening (more takes/reviewers) |
 | P0-04 | Timing/memory/output/repeat reports, reference callback probes, C++ termination (per stage and final write), repeated jobs, cold start/temp disk, and bad-asset/scarce-VRAM failures recorded | True out-of-memory on a smaller GPU, slower-disk cold starts, other targets; agree on quality and latency |
 | P0-05 | Metal-first evaluation order and MPS correctness issue documented | Real Mac Metal test, then measured alternatives only if necessary |
-| P0-06 | [Preliminary dependency/license inventory](dependencies.md); user selected Apache-2.0, applied in LICENSE; cuBLAS pack pinned and verified | Tokenizer terms, NVIDIA end-user download review, approved distribution origins and exact bundled-component notices |
+| P0-06 | [Preliminary dependency/license inventory](dependencies.md); user selected Apache-2.0, applied in LICENSE; cuBLAS pack pinned and verified; [model terms draft](model-terms.md) | Tokenizer terms, NVIDIA end-user download review, approved distribution origins and exact bundled-component notices |
 | P0-07 | .NET 10, Gir.Core 0.8.1 and candidate OS/package baselines recorded | Validate GTK closure/API floor, Mac SDK, and clean-machine packaging path |
 
 All Phase 0 checklist items remain open because each includes work beyond this
