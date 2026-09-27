@@ -170,6 +170,18 @@ the model cache: catalog-pinned archive and per-file digests, allow-listed
 extraction, a separate cache, full hashing before each helper launch, and
 full-path loading so a planted same-named library cannot be picked up.
 
+## Owner decisions (2026-09-27)
+
+| Decision | Choice | Basis and follow-up |
+| --- | --- | --- |
+| Windows and Linux engine | **yue2.cpp with the Q8 generator and F32 decoder, provisional** | Faster and lighter than the reference, preferred in the first blind review, no Python to bundle. macOS stays open until the Metal run |
+| Model source | **Project mirror on Cloudflare R2 hosting the project's own conversion of the official weights**, with LICENSE, notices and a conversion note | FEATURES.md section 5. Produce the conversion with the pinned yue2.cpp converter, check it against the tested Q8 files (re-test if not byte-identical), choose the mirror domain, and pin it |
+| Alternate source | **Hugging Face, through an explicit switch after the mirror fails** (NET-006) | Pin its files separately; decide whether it hosts the same conversion or uses the community GGUF |
+| Machines without a supported GPU | **Allow an explicitly chosen slow CPU mode** with a measured estimate; never a silent fallback | FEATURES.md GEN-011 and AC-018. Set CPU and RAM minimums from measurements |
+| Model terms in the app | **One-time acknowledgement before the first model download**, also in settings and credits | FEATURES.md UX-005; wording drafted in `docs/validation/phase0/model-terms.md` |
+| Minimum GPU | **Deferred** until the RTX 3070 Laptop (8 GB) rerun on AC power | Tells whether 8 GB of VRAM spills |
+| Speed target | **Deferred** until more hardware results (laptop rerun, Mac) | Current: full song 38 s (RTX 4090), 30 s (RTX 5090) |
+
 ## Decisions still required to close Phase 0
 
 1. Complete native Linux C++ builds and short/full-song runs (Windows CUDA done).

@@ -34,7 +34,9 @@ The supported hardware/OS matrix is a release deliverable. Working operating
 system graphics drivers remain a machine prerequisite. The installer must not
 fetch GPU drivers or development toolkits. Compatibility checks before a large
 download must explain unsupported hardware in plain language. Do not advertise
-unmeasured CPU, Intel Mac, AMD, Intel GPU, or low-memory support.
+unmeasured Intel Mac, AMD, Intel GPU, or low-memory support. CPU-only generation
+is offered only as the explicitly chosen slow mode in GEN-011, never as a
+supported or silent default.
 
 MVP scope: lyrics and style to one song; required model preparation; generation
 progress and Stop; playback; WAV export; projects and a local results list; model
@@ -56,6 +58,7 @@ integration are deferred. Saving a generated score does not imply an MVP score e
 | GEN-008 | Stop MUST cancel the entire operation, including retry waits and reconnects, and prevent all later stages from starting. Display Stopping until work has actually stopped; retain reusable download bytes. Ignore late events from the cancelled job. |
 | GEN-009 | After a stop or failure, retain composer inputs and previous results. A later Generate creates a new snapshot and reuses compatible cached data. Failed or cancelled work MUST NOT be presented or auto-played as a successful new result. |
 | GEN-010 | Report success only after a playable audio file and its project metadata are saved. A model that reaches a generation limit MUST produce an explicit incomplete-result warning if audio is retained. An engine's success report is not sufficient: before saving a take as successful, the app MUST check that the audio is finite, not silent, and has the expected format and a plausible duration. Audio that fails these checks is a failed generation, not a take; the error suggests verifying the model files (MOD-011), and the audio is kept only as a diagnostic, never shown or auto-played as a result. |
+| GEN-011 | On a machine without a supported GPU backend, the app MAY offer CPU-only generation as a slow mode. The compatibility check MUST say no supported GPU was found and show a measured time estimate before the user chooses it, for example about 15 minutes per minute of audio on a 16-core desktop CPU. The app MUST NOT fall back to the CPU silently when a GPU backend fails to start. Minimum CPU and RAM for this mode are set from measurements before release. |
 
 Suggested first-use copy:
 
@@ -148,8 +151,14 @@ extraction are shown as verification, not as network stalls or music progress.
 | NET-006 | A source change MUST be explicit. If an approved alternate exists, explain the change and possible extra download before the user selects it. Otherwise offer Retry without inventing a mirror. Never mix partials across source identities. |
 | NET-007 | Keep transient signed redirect URLs separate from model/cache identity. Do not log credentials or complete signed query strings. Downloaded paths MUST remain inside the selected cache; reject traversal, unsafe aliases, and symlink escapes. |
 
-MVP sources are curated in the shipped catalog. Advanced arbitrary repositories,
-self-hosted source configuration, and operating a Lagu mirror are deferred.
+MVP sources are curated in the shipped catalog. The primary source is the
+project's model mirror on Cloudflare R2, which hosts the project's own pinned
+conversion of the official YuE2 weights with their LICENSE, notices, and a note
+of the conversion. Hugging Face is the approved alternate source (NET-006): the
+app offers it only through an explicit switch after the mirror fails, and pins
+its files separately. Advanced arbitrary repositories and user-configured
+sources remain deferred. The mirror is free and non-commercial, as the weight
+license requires.
 Bunyi's production model URLs and credentials are not Lagu defaults.
 
 ## 6. Results, projects, and privacy
@@ -165,6 +174,7 @@ Bunyi's production model URLs and credentials are not Lagu defaults.
 | UX-002 | Provide local help for model setup, offline operation, supported hardware, lyric structure, storage, and recovery. Help MUST work while disconnected or busy. |
 | UX-003 | Support keyboard operation, native accessibility APIs, readable scaling, and native file dialogs. Match feature behavior across platforms without forcing identical layouts. |
 | UX-004 | Show application, dependency, engine, and model credits/licenses. Do not imply that the application's open-source license replaces YuE2 weight restrictions. |
+| UX-005 | Before the first model download, the app MUST show a short summary of the model terms (CC BY-NC 4.0, the individual creator permission to monetize outputs, that company commercial use needs a separate license, and the responsible-use conditions) with a link to the full terms, and record a one-time acknowledgement. Declining cancels preparation and keeps the draft. The terms remain available in model settings and credits. |
 
 Closing the app during work stops and cleans up its helper before exit, retaining
 partial downloads and the saved draft. The OS may forcibly terminate the app;
@@ -181,7 +191,7 @@ accessibility testing. Successful compilation alone does not establish parity.
 | Scenario | Requirement coverage | Expected result |
 | --- | --- | --- |
 | AC-001 Clean install | APP-001..006 | Install with no developer runtimes present. App opens without a terminal, extra setup, model download, or GPU runtime download. |
-| AC-002 First song | GEN-001..007, MOD-001..005, MOD-015 | Generate with valid inputs and an empty cache downloads only required assets, including a GPU runtime pack only where the backend needs one, then generates automatically. |
+| AC-002 First song | GEN-001..007, MOD-001..005, MOD-015, UX-005 | Generate with valid inputs and an empty cache shows the one-time model-terms acknowledgement, then downloads only required assets, including a GPU runtime pack only where the backend needs one, then generates automatically. |
 | AC-003 Offline reuse | APP-004, MOD-008 | With a ready model and any required runtime pack, deny all network access. Generate, save, play, and export succeed; no model-source or vendor request is attempted. |
 | AC-004 Offline first use | MOD-010, GEN-009 | Empty cache while offline gives useful recovery and preserves inputs. No cloud inference fallback occurs. |
 | AC-005 Stop/resume | GEN-008..009, MOD-007, NET-001..002 | Stop midway through a large file, restart the app, and Generate. Valid files are skipped and a supported range resumes exactly. |
@@ -194,9 +204,10 @@ accessibility testing. Successful compilation alone does not establish parity.
 | AC-012 Crash and stale events | APP-003, GEN-008..010, NET-001 | Kill the helper/app during download, generation, and save. Recover draft/cache; no orphan helper, late success, or stale playback. |
 | AC-013 Project portability | OUT-001..004 | Open and play a project on each OS without its model cache. Re-generation clearly prepares a compatible profile when needed. |
 | AC-014 Storage lifecycle | MOD-004, MOD-011..015, OUT-005 | Upgrade, Verify, Remove, local import, and simultaneous app instances preserve projects and cache correctness. |
-| AC-015 Native usability | APP-007, DL-009, UX-001..004 | Keyboard/screen-reader use and display scaling keep progress, Stop, recovery, Help, and license information usable. Credits identify Lagu's Apache-2.0 source license separately from dependency and model terms. |
+| AC-015 Native usability | APP-007, DL-009, UX-001..005 | Keyboard/screen-reader use and display scaling keep progress, Stop, recovery, Help, and license information usable. Credits identify Lagu's Apache-2.0 source license separately from dependency and model terms. |
 | AC-016 Full-song quality | GEN-007, GEN-010, OUT-002..003 | Real hardware produces audible songs, reports truncation honestly, and records the engine/model settings used. An engine run that reports success but yields silent or non-finite audio (for example with same-size corrupted decoder weights) ends as a failure with a Verify suggestion, and no take is added. |
 | AC-017 GPU runtime pack | MOD-012..013, MOD-015 | Wrong archive digest, extra or traversal archive entries, a tampered same-size runtime file, and a same-named library planted in PATH, the app folder, or the working directory are rejected or never loaded. Importing the pinned vendor archive offline works. A machine whose backend needs no pack downloads none. |
+| AC-018 No-GPU slow mode | GEN-011, MOD-009 | On a machine without a supported GPU (and a GPU driver that fails to initialize), the app states that no supported GPU was found and shows the measured estimate before any CPU generation; nothing runs on the CPU without the user's choice. |
 
 | Feature group | Windows / WinForms | Linux / GTK 4 | macOS / Swift |
 | --- | --- | --- | --- |

@@ -343,7 +343,7 @@ gaps remain explicit; compiling a shared service does not complete a native UI.
 
 Work:
 
-- [ ] P6-01 Run every AC-001 through AC-017 scenario against identified candidate
+- [ ] P6-01 Run every AC-001 through AC-018 scenario against identified candidate
   builds and model profiles. Record failures against requirement IDs and retest
   affected behavior after fixes.
 - [ ] P6-02 Use deterministic transport tests for partial/unknown responses, range
@@ -364,7 +364,7 @@ Work:
 Deliverables: acceptance ledger, failure/recovery report, accessibility results,
 updated compatibility measurements, and resolved defect records.
 
-**Exit gate:** all 17 acceptance scenarios have passing evidence on each supported
+**Exit gate:** all 18 acceptance scenarios have passing evidence on each supported
 platform, with scope-specific hardware evidence for real generation. Fix blockers
 before release. A new OS or engine exception requires a feature-spec update;
 adding a footnote to this plan cannot waive a product requirement.
@@ -412,9 +412,10 @@ work; the feature specification remains authoritative if wording changes.
 | --- | --- | --- |
 | APP-001 through APP-003 | 1, 3, 4, 7 | AC-001, AC-002, AC-012 on final native packages |
 | APP-004 through APP-006 | 2, 3, 4, 7 | AC-001 through AC-004 with network observation |
-| APP-007, UX-004 | 0, 5, 7 | App/source and dependency/model notices; AC-015 |
+| APP-007, UX-004, UX-005 | 0, 4, 5, 7 | App/source and dependency/model notices; AC-015 |
 | GEN-001 through GEN-005 | 1, 3, 4, 5 | AC-002, AC-004, AC-011 |
 | GEN-006 through GEN-010 | 3, 4, 5 | AC-005, AC-012, AC-016 |
+| GEN-011 | 3, 4, 5 | AC-018 on a machine without a supported GPU |
 | MOD-001 through MOD-010, MOD-013 through MOD-014 | 0, 2, 4 | AC-002 through AC-007, AC-011, AC-014 |
 | MOD-011 through MOD-012 | 2, 5 | AC-014, AC-015 |
 | DL-001 through DL-009 | 2, 4, 5 | AC-008, AC-009, AC-015 |
@@ -435,6 +436,7 @@ than using unverified download sizes, memory figures, or calendar estimates.
 | --- | --- | --- |
 | Engine/backend and redistributable dependency set | End of phase 0 | Complete measured generation and bundled-runtime feasibility on each target. |
 | Vendor GPU runtime pack terms and pins | End of phase 0 | Terms: decided 2026-09-26 by the project owner's reading (no download gate observed); show the archive's NVIDIA license. Windows pins verified; Linux pins still needed. |
+| Model mirror and conversion | End of phase 0 | Decided 2026-09-27: host the project's own conversion of the official weights on the Cloudflare R2 mirror, with Hugging Face as the explicit alternate. Still to do: produce and verify the conversion, choose the mirror domain, and pin both sources. |
 | Approved model distribution terms | End of phase 0 | Apache-2.0 source license selected and applied; exact selected components/weights still need distribution review. |
 | Candidate OS/architecture/GPU profiles and GTK baseline | End of phase 0; confirm in 6 | Actual compatibility, memory, quality, and latency evidence. |
 | Model revisions, origin, full asset set, hashes | End of phase 0; verify in 7 | Immutable files and approved distribution; no invented Lagu mirror. |
