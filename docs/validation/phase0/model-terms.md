@@ -1,6 +1,6 @@
 # YuE2 model terms review (draft for P0-06)
 
-Date: 2026-09-27. Status: **draft; decisions open**. This records what the
+Date: 2026-09-27. Status: **draft; origin and user-facing terms decided 2026-09-27, other items open**. This records what the
 pinned license files say and what they imply for Alunan. It is not legal advice.
 
 ## What the files say
@@ -49,13 +49,15 @@ material".
 1. **Tokenizer terms.** `qwen.tiktoken` (151,643 ordinary tokens) is a Qwen
    tokenizer file, also embedded in the GGUF. Its license is not stated in the
    pinned files; identify its origin and terms.
-2. **GGUF origin.** Approve `Serveurperso/YuE2-GGUF`, a community conversion,
-   as the download origin, or convert the official weights and host them. A
-   conversion is adapted material under CC BY-NC 4.0; hosting it needs
-   attribution and a note of the change, and must stay non-commercial.
+2. **GGUF origin (decided).** The project converts the official weights itself
+   and hosts them on its Cloudflare R2 mirror, with Hugging Face as the explicit
+   alternate. The conversion is adapted material under CC BY-NC 4.0: host it
+   with the LICENSE, notices, attribution and a note of the change, free and
+   non-commercial.
 3. **Permission coverage.** Confirm with the authors that the individual creator
-   permission covers use through the GGUF conversion; the model repositories'
-   own LICENSE files do not repeat it.
-4. **User-facing text.** Decide where the license, the creator permission, the
-   company-use limit, and the responsible-use conditions appear, and whether
-   first use requires acknowledging them.
+   permission covers use through the project's GGUF conversion; the model
+   repositories' own LICENSE files do not repeat it.
+4. **User-facing text (decided).** A one-time acknowledgement before the first
+   model download summarizes the license, the creator permission, the
+   company-use limit, and the responsible-use conditions, with the full terms
+   linked; they stay in model settings and credits (FEATURES.md UX-005).
