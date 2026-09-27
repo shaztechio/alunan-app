@@ -57,15 +57,22 @@ choose another host.
 1. Add your SSH public key to your Vast account (Account, SSH keys). SSH is the
    most dependable way into a custom image; Jupyter or web-terminal modes may
    not work with a bare CUDA image.
-2. Search for **1× RTX 5090** and filter or sort by the host's listed
-   **Max CUDA: choose 13.3 or higher**. The `nvidia/cuda:13.3.1` image can refuse
-   to start on a host whose driver supports an older CUDA, before the script's
-   own driver check can run.
+2. Search for **1× RTX 5090** and choose a host whose listed **Max CUDA is 13.0
+   or higher** (avoid 12.x). Few hosts report 13.3, so the template sets
+   `NVIDIA_DISABLE_REQUIRE=1` (step 4): it skips the image's start-up check that
+   refuses hosts below CUDA 13.3. CUDA 13 minor-version compatibility lets code
+   built with the 13.3 compiler run on any CUDA 13 driver (580 or newer), and the
+   script still checks the driver. Prefer more CPU cores (faster build) and avoid
+   hosts in mainland China, where GitHub, Hugging Face and NVIDIA downloads can be
+   slow or blocked.
 3. Choose **on-demand**, not interruptible (bid) pricing, so the 30–60 minute
    run is not stopped midway. Prefer verified hosts with high reliability.
 4. In the template, set the image to `nvidia/cuda:13.3.1-devel-ubuntu24.04`,
-   the launch mode to **SSH**, and the disk to **at least 40 GB**. Disk size is
-   fixed when the instance is created.
+   add the environment variable `NVIDIA_DISABLE_REQUIRE=1`, set the launch mode
+   to **SSH**, and the disk to **at least 40 GB**. Disk size is fixed when the
+   instance is created. If generation then fails with a CUDA driver error, record
+   it and fall back to a `nvidia/cuda:13.0.x-devel-ubuntu24.04` image (older
+   compiler, recorded as a toolchain difference).
 5. Rent it, then connect with the SSH command from the instance's **Connect**
    button (it includes a non-standard port) and start the kit as above.
 6. From a terminal on your PC, copy the results using that port and address:
