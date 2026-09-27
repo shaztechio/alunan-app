@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "observedAt": "2026-09-27",
+  "purpose": "Prove FEATURES.md MOD-015 full-path loading of the GPU runtime pack on Windows and preview AC-017",
+  "mechanism": [
+    "ggml-cuda.dll linked with /DELAYLOAD:cublas64_13.dll (delayimp.lib), so cuBLAS is not loaded at process start",
+    "At the start of main, when ALUNAN_GPU_RUNTIME_DIR is set: SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32), then LoadLibraryExW by full path for cublasLt64_13.dll and cublas64_13.dll with LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32; any failure exits 1 before model loading",
+    "The delay-load helper then resolves cublas64_13.dll to the already-loaded module"
+  ],
+  "patch": "tools/phase0/patches/yue-synth-gpu-runtime-dir.patch (applied to a copy of the pinned yue2.cpp f17d526; the pinned checkout is unchanged)",
+  "build": "tools/phase0/build-yue2-cpp-runtime-proto.cmd (sm_89, same toolchain as windows-cpp-build.json); the binary still reports the upstream version string, so it is identified by hash",
+  "binaries": {
+    "yue-synth.exe": "b20f404025f4f68187a0c8a6fe2c0a8407ea707bd59eb3aaf44e5b9871da054a",
+    "ggml.dll": "07bf751e47861036f6d61b8d5a665a09b6f3a1acecf7532ae025ead068b22cb7",
+    "ggml-base.dll": "a1d28458b9e7e09e03cac02fef11074bcca1d97a3dba7da7965ebe29854d3e58",
+    "ggml-cpu.dll": "a31cec47643ca16f33bff80754e21ac50d7dfeb99ad3beb609482f543ecb7ab8",
+    "ggml-cuda.dll": "5a2c03d1f447e3302f297b02dd340f0af40a359cdbbed5549777bed73619ddd8"
+  },
+  "packSha256": {
+    "cublas64_13.dll": "8c6bac24474af29627ec96500025a5d410a1b7e8ffa00e1fe13b1781fc6b3ddc",
+    "cublasLt64_13.dll": "e323abd89e0f03c1db91a09d7aeb1928de08e1f86192cc713b335fefe3e368a9"
+  },
+  "fakes": "4,096 random bytes named cublas64_13.dll and cublasLt64_13.dll, planted in the engine's own folder, the working directory and a folder prepended to PATH",
+  "cases": [
+    {
+      "case": "default-search",
+      "env": false,
+      "plant": false,
+      "exitCode": "0x00000000",
+      "seconds": 15.09,
+      "cublasMapped": [
+        "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.3\\bin\\x64\\cublas64_13.dll",
+        "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v13.3\\bin\\x64\\cublasLt64_13.dll"
+      ],
+      "runtimeLines": [],
+      "wavSha256": "7c7025c597fee071e0c4b40d6a8915d4e1bd384ccc4375db4b6c319a31adadca"
+    },
+    {
+      "case": "full-path-toolkit-on-path",
+      "env": true,
+      "plant": false,
+      "exitCode": "0x00000000",
+      "seconds": 15.18,
+      "cublasMapped": [
+        ".phase0\\runtime-packs\\cublas-13.6.0.2-win-x64\\files\\cublas64_13.dll",
+        ".phase0\\runtime-packs\\cublas-13.6.0.2-win-x64\\files\\cublasLt64_13.dll"
+      ],
+      "runtimeLines": [
+        "[Runtime] Loaded .phase0\\runtime-packs\\cublas-13.6.0.2-win-x64\\files\\cublasLt64_13.dll",
+        "[Runtime] Loaded .phase0\\runtime-packs\\cublas-13.6.0.2-win-x64\\files\\cublas64_13.dll"
+      ],
+      "wavSha256": "7c7025c597fee071e0c4b40d6a8915d4e1bd384ccc4375db4b6c319a31adadca"
+    },
+    {
+      "case": "full-path-with-planted-fakes",
+      "env": true,
+      "plant": true,
+      "exitCode": "0x00000000",
+      "seconds": 14.97,
+      "cublasMapped": [
+        ".phase0\\runtime-packs\\cublas-13.6.0.2-win-x64\\files\\cublas64_13.dll",
+        ".phase0\\runtime-packs\\cublas-13.6.0.2-win-x64\\files\\cublasLt64_13.dll"
+      ],
+      "runtimeLines": [
+        "[Runtime] Loaded .phase0\\runtime-packs\\cublas-13.6.0.2-win-x64\\files\\cublasLt64_13.dll",
+        "[Runtime] Loaded .phase0\\runtime-packs\\cublas-13.6.0.2-win-x64\\files\\cublas64_13.dll"
+      ],
+      "wavSha256": "7c7025c597fee071e0c4b40d6a8915d4e1bd384ccc4375db4b6c319a31adadca"
+    },
+    {
+      "case": "default-search-with-planted-fakes",
+      "env": false,
+      "plant": true,
+      "exitCode": "0xC06D007E",
+      "seconds": 14.29,
+      "cublasMapped": [],
+      "runtimeLines": [],
+      "wavSha256": null
+    },
+    {
+      "case": "full-path-missing-pack",
+      "env": true,
+      "plant": false,
+      "pack": "missing",
+      "exitCode": "0x00000001",
+      "seconds": 0.08,
+      "cublasMapped": [],
+      "runtimeLines": [
+        "[Runtime] FATAL: cannot load .phase0\\runs\\windows-runtime-loading\\full-path-missing-pack\\no-such-pack\\cublasLt64_13.dll (error 126)"
+      ],
+      "wavSha256": null
+    }
+  ],
+  "findings": [
+    "With ALUNAN_GPU_RUNTIME_DIR set, cuBLAS loaded only from the verified pack, even with the CUDA toolkit on PATH and fakes planted in the app folder, working directory and PATH; the WAV matched the reference hash",
+    "Without it, the default search loaded the toolkit's cuBLAS, and with fakes planted it loaded a fake and failed at first cuBLAS use (exception 0xC06D007E) after model loading and planning",
+    "A missing or unreadable pack fails in 0.08 s with a clear message before any model loads",
+    "The full-path mechanism needs a small engine patch plus a delay-load link flag; Phase 3's worker adapter should own it and pass the verified runtime folder explicitly"
+  ],
+  "limitations": [
+    "Windows only; Linux needs the equivalent (dlopen of absolute paths before ggml-cuda, or an $ORIGIN-relative RUNPATH to a controlled folder) and has not been tested",
+    "The worker's pre-launch hash check of the pack (MOD-015) is not part of this engine-side proof",
+    "System32 remains searched for other DLLs; a same-named library there requires administrator rights to place"
+  ]
+}

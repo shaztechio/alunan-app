@@ -1,0 +1,54 @@
+diff --git a/tools/yue-synth.cpp b/tools/yue-synth.cpp
+index b004470..e4e74ce 100644
+--- a/tools/yue-synth.cpp
++++ b/tools/yue-synth.cpp
+@@ -13,6 +13,37 @@
+ #include <string>
+ #include <vector>
+ 
++#ifdef _WIN32
++#    define WIN32_LEAN_AND_MEAN
++#    include <windows.h>
++#    include <cwchar>
++
++// Alunan Phase 0 prototype for FEATURES.md MOD-015: when ALUNAN_GPU_RUNTIME_DIR
++// names the verified runtime-pack folder, restrict later DLL searches to
++// System32 and load cuBLAS only by full path from that folder. ggml-cuda.dll is
++// linked with /DELAYLOAD:cublas64_13.dll, so nothing has loaded cuBLAS yet.
++static int alunan_load_gpu_runtime() {
++    const wchar_t * dir = _wgetenv(L"ALUNAN_GPU_RUNTIME_DIR");
++    if (!dir || !*dir) {
++        return 0;
++    }
++    if (!SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_SYSTEM32)) {
++        fwprintf(stderr, L"[Runtime] FATAL: SetDefaultDllDirectories failed (error %lu)\n", GetLastError());
++        return -1;
++    }
++    const wchar_t * names[] = { L"cublasLt64_13.dll", L"cublas64_13.dll" };
++    for (const wchar_t * name : names) {
++        std::wstring path = std::wstring(dir) + L"\\" + name;
++        if (!LoadLibraryExW(path.c_str(), nullptr, LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR | LOAD_LIBRARY_SEARCH_SYSTEM32)) {
++            fwprintf(stderr, L"[Runtime] FATAL: cannot load %ls (error %lu)\n", path.c_str(), GetLastError());
++            return -1;
++        }
++        fwprintf(stderr, L"[Runtime] Loaded %ls\n", path.c_str());
++    }
++    return 0;
++}
++#endif
++
+ // song.mp3 -> song12.mp3 for song 1, variation 2
+ static std::string indexed(const std::string & path, int song, int variation) {
+     std::string idx = std::to_string(song) + std::to_string(variation);
+@@ -61,6 +92,11 @@ static void print_usage(const char * prog) {
+ }
+ 
+ int main(int argc, char ** argv) {
++#ifdef _WIN32
++    if (alunan_load_gpu_runtime() != 0) {
++        return 1;
++    }
++#endif
+     if (argc < 2) {
+         print_usage(argv[0]);
+         return 1;

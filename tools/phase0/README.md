@@ -129,6 +129,13 @@ missing, truncated, corrupted, and wrong model files from scratch copies, then
 the short job with a helper holding VRAM (`--keep-free-mib`). Both delete their
 scratch copies.
 
+`build-yue2-cpp-runtime-proto.cmd` builds the pinned engine with
+`patches/yue-synth-gpu-runtime-dir.patch` applied to a copy of the source
+(`.phase0/yue2-cpp-proto-src`) and cuBLAS delay-loaded.
+`probe-runtime-loading.py <new-report.json>` then runs it with and without
+`ALUNAN_GPU_RUNTIME_DIR`, with fake cuBLAS DLLs planted in the app folder,
+working directory and PATH, and records which cuBLAS files were mapped.
+
 `make-listening-kit.py` writes a blind A/B kit of the retained reference and C++
 takes to `.phase0/listening/kit-1` with a scoring sheet and a separate key.
 
