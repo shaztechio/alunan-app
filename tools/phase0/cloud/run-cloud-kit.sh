@@ -70,7 +70,8 @@ if [ ! -x "$B/yue-synth" ]; then
   echo "buildSeconds $(( $(date +%s) - start ))" | tee "$RESULTS/build-time.txt"
 fi
 {
-  "$B/yue-synth" --help 2>&1 | head -1
+  # yue-synth --help exits 1 after printing usage; do not let that stop the kit.
+  ("$B/yue-synth" --help 2>&1 || true) | head -1
   gcc --version | head -1; cmake --version | head -1
   sha256sum "$B/yue-synth" "$B"/*.so*
   ldd "$B/yue-synth" "$B"/libggml*.so* || true
