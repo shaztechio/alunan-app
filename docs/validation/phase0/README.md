@@ -14,6 +14,7 @@ order and the [shared spec](../../../spec/FEATURES.md) for product promises.
 | Windows x64 | Windows 11 Pro 10.0.26200; RTX 4090; 24,564 MiB reported VRAM; driver 617.14; compute capability 8.9; 101,960,773,632 bytes system RAM | Reference short/repeated/full technical checks passed; listening and packaging pending |
 | Linux auxiliary environment | Ubuntu 24.04.2 under WSL2; kernel 6.18.33.2-microsoft-standard-WSL2; same GPU/driver visible | Hardware visibility passed; no generation run; not native Linux release evidence |
 | Native Linux | No native Linux test host verified in this task | Not run |
+| Linux cloud container (RTX 5090) | Vast.ai on-demand host, `nvidia/cuda:13.3.1-devel-ubuntu24.04`, RTX 5090 32 GB (compute 12.0), driver 610.57.04, 32 vCPU EPYC 7B12 | Engine build and generation passed; Blackwell evidence; not a native desktop |
 | macOS Apple Silicon | User explicitly confirmed no Mac available yet | Not run; needs hardware |
 
 About 382.7 GB was free on the workspace volume at initial inspection. Windows
@@ -48,7 +49,8 @@ and Ninja 1.13.2 are pip packages in ignored `.phase0/build-tools-venv`, not PAT
 | AR (LM) logit parity | Not run | Upstream LM harness targets a BF16 GGUF outside the pinned profile |
 | Blind listening, reference vs C++ Q8 (Windows) | Recorded; one reviewer | [Review](windows-listening-review-1.json): all four takes pass overall; C++ candidate preferred for short and full; one distorted take per engine; small sample with listed blinding limits |
 | Pinned NVIDIA cuBLAS runtime pack (Windows) | Passed | [Record](windows-runtime-pack.json): archive matched pinned size/SHA-256; allow-listed DLLs identical to the tested toolkit copies and NVIDIA-signed; short fixture with no toolkit on PATH loaded cuBLAS only from the pack and reproduced the WAV hash |
-| Pinned NVIDIA cuBLAS runtime pack (Linux) | Pinned; not yet run on Linux | [Pins](runtime-packs.lock.json): archive (817,981,368 bytes) matched its manifest SHA-256; 32 entries, no unsafe names; the two real libraries (571.9 MB together) and LICENSE extracted without following symlinks. Extraction ran on Windows; loading needs a Linux system |
+| Pinned NVIDIA cuBLAS runtime pack (Linux) | Passed on the RTX 5090 container; CUDA runtime also needed | [Pins](runtime-packs.lock.json): archive matched its manifest SHA-256; libraries extracted without following symlinks. With only the pack on the library path, cuBLAS loaded from it and the WAV matched, but `libcudart.so.13` came from the toolkit: the Linux build links it dynamically. It is now pinned as `cudart-13.3.29-linux-x64` (1.6 MB) and verified; not yet run from the pack |
+| Linux C++ CUDA on RTX 5090 (cloud) | Passed technical checks; listening pending | [Record](linux-cloud-rtx5090.json): build 305 s; short 8.5 s, full 30.2-30.4 s over four runs; identical WAVs across processes; termination under 0.14 s; glibc floor 2.38; absolute RUNPATH to fix for packaging |
 | C++ forced termination per stage | Passed | [Record](windows-cpp-termination.json): exit within 80 ms and device GPU memory back to baseline within 140 ms at load/score/semantic/acoustic/decode; no leftover files; final write phase not probed |
 | C++ kill during final write | Failure mode confirmed | [Record](windows-cpp-final-write.json): a kill mid-write left a WAV 556 bytes short that still parses and plays; kills after writing exit 1 with complete files. Worker must stage and promote outputs |
 | C++ repeated full jobs (5 processes) | Passed | [Record](windows-full-cpp-q8-repeat5.json): 37.4-38.3 s each, identical WAVs, flat RSS/GPU peaks, same idle GPU baseline before every job |
@@ -232,6 +234,21 @@ identical to the host's CPU run. The app must bundle the C++ runtime and must
 detect a missing GPU itself instead of starting a CPU run unannounced. A clean
 machine with an NVIDIA GPU is still needed for the CUDA path.
 
+**RTX 5090 on Linux (cloud).** The cloud kit built the pinned engine with CUDA
+13.3.73 for the same architecture list as Windows in 305 s and ran it on a
+rented RTX 5090, so the `sm_120a` code is now exercised on Blackwell. The short
+song took 8.5 s and the full song 30.2-30.4 s over four processes (Windows RTX
+4090: 14.3 s and 37.7 s), with identical WAVs across processes. The Linux short
+take is a different rendition (46.0 s of audio) from the Windows take (66.4 s)
+with the same seed, which FEATURES.md permits between backends. Kills at every
+stage ended the process within 0.14 s and released GPU memory within 0.2 s.
+cuBLAS loaded from the pinned NVIDIA pack, but the Linux build also needs the
+dynamically linked CUDA runtime, now pinned as a second pack. The engine's
+RUNPATH points at the absolute build folder and must become `$ORIGIN`-relative
+for packaging. The binaries need glibc 2.38 or newer. The first attempt stopped
+after the build because `yue-synth --help` exits 1 under `set -e` (fixed). The
+whole session cost USD 0.44. This is a cloud container, not a native desktop.
+
 **Listening review.** `tools/phase0/make-listening-kit.py` wrote blind A/B pairs
 of the retained short and full takes through one WAV writer with equal
 timestamps, a scoring sheet, and a separate key. The project owner listened on
@@ -294,9 +311,9 @@ OS-denied network test is required for release AC-003/AC-016.
 
 | Task | Progress | Required before completion |
 | --- | --- | --- |
-| P0-01 | Candidate targets and current host recorded | Obtain native Linux and Apple Silicon test access |
+| P0-01 | Candidate targets, current host, and a rented Linux RTX 5090 container recorded | Obtain native Linux and Apple Silicon test access |
 | P0-02 | Source/model pins, Windows Python distribution hashes, and Windows C++ CUDA build/binary hashes recorded | Build-tool lock, Linux/Mac builds, tested profiles for all targets |
-| P0-03 | Windows reference and C++ Q8 short/repeated/full technical runs passed; Q8 acoustic-stage parity and a first blind listening review recorded | Outputs on other targets; AR parity where applicable; broader listening (more takes/reviewers) and other targets |
+| P0-03 | Windows reference and C++ Q8 runs passed; Linux C++ Q8 runs passed on a cloud RTX 5090; Q8 acoustic-stage parity and a first blind listening review recorded | Native Linux desktop and Mac outputs; AR parity where applicable; broader listening (more takes/reviewers) |
 | P0-04 | Timing/memory/output/repeat reports, reference callback probes, C++ termination (per stage and final write), repeated jobs, cold start/temp disk, and bad-asset/scarce-VRAM failures recorded | True out-of-memory on a smaller GPU, slower-disk cold starts, other targets; agree on quality and latency |
 | P0-05 | Metal-first evaluation order and MPS correctness issue documented | Real Mac Metal test, then measured alternatives only if necessary |
 | P0-06 | [Preliminary dependency/license inventory](dependencies.md); user selected Apache-2.0, applied in LICENSE; cuBLAS pack pinned and verified | Tokenizer terms, NVIDIA end-user download review, approved distribution origins and exact bundled-component notices |
@@ -311,7 +328,9 @@ Next work, by what it needs:
 - A human reviewer, later: more takes and reviewers once other targets produce
   audio; the first Windows review is recorded.
 - Other hardware: a clean Windows machine with only the NVIDIA driver (the
-  clean-image DLL check passed in Windows Sandbox); Turing/Ampere/Blackwell GPUs for architecture coverage; native Linux; Apple
-  Silicon for Metal. None of these can be counted as passing until run.
+  clean-image DLL check passed in Windows Sandbox); Turing and Ampere GPUs for
+  architecture coverage (Blackwell passed on a cloud RTX 5090; an RTX 30-series
+  kit is ready); a native Linux desktop; Apple Silicon for Metal. None of these
+  can be counted as passing until run.
 - Here: the Windows C++ feasibility checks this machine can run are done.
   Native Linux and Apple Silicon hardware validation remain explicit open gates.

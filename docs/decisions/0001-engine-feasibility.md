@@ -152,6 +152,10 @@ archive download over plain HTTPS without sign-in, token, or click-through. If
 NVIDIA later adds a gate, the fallback must be reconsidered in FEATURES.md first;
 sending users to install a toolkit themselves conflicts with APP-002. The app
 shows NVIDIA's bundled license (the archive's `LICENSE`) with the pack (MOD-015).
+A rented Linux RTX 5090 run (2026-09-27) showed the Linux build also loads
+`libcudart.so.13` dynamically, so the Linux runtime pack pairs cuBLAS with the
+1.6 MB CUDA runtime archive, pinned in `runtime-packs.lock.json`. Building with
+a static CUDA runtime on Linux is an alternative to evaluate in Phase 3.
 Still required before Phase 0 closes: full-path loading from a worker. The Linux archive is larger than
 the Windows DLLs because it includes static libraries; that user-visible cost
 is recorded rather than avoided. If the terms review fails, return to FEATURES.md

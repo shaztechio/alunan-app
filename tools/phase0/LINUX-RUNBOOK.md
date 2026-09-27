@@ -107,6 +107,16 @@ pinned on 2026-09-26 from a verified extraction: `libcublas.so.13` 55,354,008
 bytes and `libcublasLt.so.13` 516,598,272 bytes. Compare them with the toolkit
 copies under `/usr/local/cuda-13.3` and record whether they are identical.
 
+The Linux build links the CUDA runtime dynamically (Windows links it
+statically), so the Linux runtime folder also needs `libcudart.so.13`, pinned as
+a second pack from the same NVIDIA manifest (1.6 MB):
+
+```bash
+.phase0/linux-venv/bin/python tools/phase0/prepare-runtime-pack.py --pack cudart-13.3.29-linux-x64
+```
+
+Copy both packs' `files/*.so.*` into one folder for the toolkit-free run.
+
 ## 6. Models
 
 ```bash
@@ -132,7 +142,7 @@ Toolkit-free run with the runtime pack:
 
 ```bash
 $PY tools/phase0/run-cpp.py --build $B --request tools/phase0/requests/short.json \
-  --output .phase0/runs/linux-short-cpp-q8-runtime-pack --runtime-dir .phase0/runtime-packs/cublas-13.6.0.2-linux-x64/files
+  --output .phase0/runs/linux-short-cpp-q8-runtime-pack --runtime-dir .phase0/runtime-packs/linux-gpu-runtime
 ```
 
 On Linux `--runtime-dir` sets `LD_LIBRARY_PATH` to the pack only and removes
