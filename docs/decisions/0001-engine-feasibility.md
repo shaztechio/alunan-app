@@ -156,7 +156,11 @@ A rented Linux RTX 5090 run (2026-09-27) showed the Linux build also loads
 `libcudart.so.13` dynamically, so the Linux runtime pack pairs cuBLAS with the
 1.6 MB CUDA runtime archive, pinned in `runtime-packs.lock.json`. Building with
 a static CUDA runtime on Linux is an alternative to evaluate in Phase 3.
-Still required before Phase 0 closes: full-path loading from a worker. The Linux archive is larger than
+Full-path loading is proven on Windows (2026-09-27): a small patch plus
+`/DELAYLOAD:cublas64_13.dll` lets the engine lock DLL search to System32 and load
+cuBLAS only from the verified runtime folder, ignoring planted copies
+([record](../validation/phase0/windows-runtime-loading.json)). The Linux
+equivalent remains to be tested. The Linux archive is larger than
 the Windows DLLs because it includes static libraries; that user-visible cost
 is recorded rather than avoided. If the terms review fails, return to FEATURES.md
 before choosing another distribution method.
