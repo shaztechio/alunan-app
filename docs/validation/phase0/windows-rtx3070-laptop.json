@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "status": "correctness-passed-timing-not-representative",
+  "observedAt": "2026-09-27",
+  "machine": {
+    "os": "Microsoft Windows 11 Pro 10.0.22631.0",
+    "cpu": "AMD Ryzen 9 5900HX with Radeon Graphics",
+    "ramBytes": 33720123392,
+    "gpus": [
+      "AMD Radeon(TM) Graphics driver 27.20.21018.0",
+      "NVIDIA GeForce RTX 3070 Laptop GPU driver 32.0.16.1714"
+    ],
+    "gpu": "NVIDIA GeForce RTX 3070 Laptop GPU, 8 GB, compute capability 8.6 (Ampere)",
+    "power": "On battery with low charge (reported by the owner); the kit did not yet record power state"
+  },
+  "kit": ".phase0/rtx30-kit from tools/phase0/bundle/make-portable-kit.ps1 (multi-architecture build, app-local runtime DLLs, verified cuBLAS pack)",
+  "system32Runtime": {
+    "msvcp140.dll": true,
+    "vcruntime140.dll": true,
+    "vcruntime140_1.dll": true,
+    "vcomp140.dll": true,
+    "nvcuda.dll": true
+  },
+  "loadedModulesOutsideWindows": [
+    "MSVCP140.dll",
+    "VCOMP140.DLL",
+    "VCRUNTIME140.dll",
+    "VCRUNTIME140_1.dll",
+    "cublas64_13.dll",
+    "cublasLt64_13.dll",
+    "ggml-base.dll",
+    "ggml-cpu.dll",
+    "ggml-cuda.dll",
+    "ggml.dll",
+    "yue-synth.exe"
+  ],
+  "runs": [
+    {
+      "fixture": "short",
+      "generationExitCode": "0x00000000",
+      "generationSeconds": 243.38,
+      "wavSha256": "6d77d0ecb525b46f757ad991518b20324e5a254435c194e7ea91325b36d5ba6e",
+      "wavBytes": 25558572,
+      "truncated": false,
+      "backendLines": [
+        "ggml_cuda_init: found 1 CUDA devices (Total VRAM: 8191 MiB):",
+        "  Device 0: NVIDIA GeForce RTX 3070 Laptop GPU, compute capability 8.6, VMM: yes, VRAM: 8191 MiB",
+        "[Load] KV backend: CUDA0 (CPU threads: 8)",
+        "[Load] LM backend: CUDA0 (CPU threads: 8)",
+        "[Load] NAR backend: CUDA0 (CPU threads: 8)",
+        "[Load] VAE backend: CUDA0 (CPU threads: 8)",
+        "[Pipeline] Done: 1 tracks, 66.6 s of audio in 242.5 s (0.3x realtime)"
+      ],
+      "stageLog": [
+        "[Store] Load LM: 3253 ms",
+        "[AR] Score: 673 tokens over 1 songs, 674 steps, 42.8 s (63.5 ms/step)",
+        "[AR] Semantic: 1664 tokens over 1 songs, 1665 steps, 78.4 s (47.1 ms/step)",
+        "[Store] Load NAR: 1208 ms",
+        "[NAR] Solved: T_lat=1664, 1 variations, 32 steps, 104206 ms (3256.4 ms/step)",
+        "[Store] Load VAE: 1256 ms",
+        "[VAE] Tiled decode done: 4 tiles -> T_audio=3194816 (66.56s @ 48kHz), 11151 ms",
+        "[Pipeline] Done: 1 tracks, 66.6 s of audio in 242.5 s (0.3x realtime)"
+      ],
+      "audioSeconds": 66.56,
+      "sampleRate": 48000,
+      "channels": 2,
+      "finite": true,
+      "peakAbs": 0.9692
+    },
+    {
+      "fixture": "full",
+      "generationExitCode": "0x00000000",
+      "generationSeconds": 1857.57,
+      "wavSha256": "6acac51c424db1a3d064ed0f7cff758a43f81df92d3680e0f8558f3b241939c7",
+      "wavBytes": 65218092,
+      "truncated": false,
+      "backendLines": [
+        "ggml_cuda_init: found 1 CUDA devices (Total VRAM: 8191 MiB):",
+        "  Device 0: NVIDIA GeForce RTX 3070 Laptop GPU, compute capability 8.6, VMM: yes, VRAM: 8191 MiB",
+        "[Load] KV backend: CUDA0 (CPU threads: 8)",
+        "[Load] LM backend: CUDA0 (CPU threads: 8)",
+        "[Load] NAR backend: CUDA0 (CPU threads: 8)",
+        "[Load] VAE backend: CUDA0 (CPU threads: 8)",
+        "[Pipeline] Done: 1 tracks, 169.8 s of audio in 1856.6 s (0.1x realtime)"
+      ],
+      "stageLog": [
+        "[Store] Load LM: 1702 ms",
+        "[AR] Score: 1809 tokens over 1 songs, 1810 steps, 274.7 s (151.8 ms/step)",
+        "[AR] Semantic: 4246 tokens over 1 songs, 4247 steps, 597.6 s (140.7 ms/step)",
+        "[Store] Load NAR: 4722 ms",
+        "[NAR] Solved: T_lat=4246, 1 variations, 32 steps, 940484 ms (29390.1 ms/step)",
+        "[Store] Load VAE: 1930 ms",
+        "[VAE] Tiled decode done: 9 tiles -> T_audio=8152256 (169.84s @ 48kHz), 35112 ms",
+        "[Pipeline] Done: 1 tracks, 169.8 s of audio in 1856.6 s (0.1x realtime)"
+      ],
+      "audioSeconds": 169.84,
+      "sampleRate": 48000,
+      "channels": 2,
+      "finite": true,
+      "peakAbs": 0.916
+    }
+  ],
+  "comparisonRtx4090": {
+    "scoreMsPerToken": 4.0,
+    "semanticMsPerToken": 3.1,
+    "acousticSecondsPerStep": {
+      "short": 0.098,
+      "full": 0.365
+    },
+    "fullSongSeconds": 37.7
+  },
+  "findings": [
+    "The sm_86 (Ampere) code path runs correctly: both songs completed on CUDA0 with finite, non-silent 48 kHz stereo audio, no truncation, and peaks below full scale",
+    "Every non-Windows DLL, including cuBLAS from the separate runtime folder and the app-local C++ runtime, loaded from the kit",
+    "Timings are not representative: the laptop ran on a low battery. Per-token AR time rose from about 50-64 ms (short run) to 141-152 ms (full run), consistent with power throttling as the battery drained",
+    "Flow matching took 3.3 s/step (short) and 29.4 s/step (full); whether 8 GB of VRAM also overflowed into shared memory cannot be determined from this run",
+    "WAV hashes differ from the RTX 4090 run (different GPU architecture); the short take is 66.56 s versus 66.36 s"
+  ],
+  "limitations": [
+    "Not a clean machine: the Visual C++ runtime and OpenMP DLLs are installed system-wide, so the negative control still loaded (the Windows Sandbox record covers the clean case)",
+    "No GPU memory, clock, power, or throttle telemetry was recorded; run-test.ps1 now records these and the power source for the rerun on AC power"
+  ]
+}
