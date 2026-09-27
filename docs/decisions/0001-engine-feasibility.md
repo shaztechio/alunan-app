@@ -176,6 +176,7 @@ full-path loading so a planted same-named library cannot be picked up.
 | --- | --- | --- |
 | Windows and Linux engine | **yue2.cpp with the Q8 generator and F32 decoder, provisional** | Faster and lighter than the reference, preferred in the first blind review, no Python to bundle. macOS stays open until the Metal run |
 | Model source | **Project mirror on Cloudflare R2 hosting the project's own conversion of the official weights**, with LICENSE, notices and a conversion note | FEATURES.md section 5. Produce the conversion with the pinned yue2.cpp converter, check it against the tested Q8 files (re-test if not byte-identical), choose the mirror domain, and pin it |
+| Conversion status | **Done and verified 2026-09-27** ([record](../validation/phase0/own-conversion.json)) | Decoder byte-identical to the tested file; Q8 generator tensors identical and output WAV identical. Upload set staged; mirror domain and upload pending |
 | Alternate source | **Hugging Face, through an explicit switch after the mirror fails** (NET-006) | Pin its files separately; decide whether it hosts the same conversion or uses the community GGUF |
 | Machines without a supported GPU | **Allow an explicitly chosen slow CPU mode** with a measured estimate; never a silent fallback | FEATURES.md GEN-011 and AC-018. Set CPU and RAM minimums from measurements |
 | Model terms in the app | **One-time acknowledgement before the first model download**, also in settings and credits | FEATURES.md UX-005; wording drafted in `docs/validation/phase0/model-terms.md` |
