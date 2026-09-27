@@ -180,7 +180,10 @@ bundle and models mapped read-only, `.phase0/sandbox-results` writable).
 `run-test.ps1 -Bundle <dir> -Models <dir> -Results <dir> [-Fixture full]` records
 the OS, whether the C++ runtime exists in System32, a negative control run of
 the engine without its app-local runtime DLLs, a load check, one generation, and
-every DLL the process maps. In the sandbox there is no CUDA device, so the
+every DLL the process maps. It also records the power source (with a warning on
+battery), GPU memory, clocks, power and throttle reasons from `nvidia-smi`, and
+the process's dedicated versus shared GPU memory from Windows counters (shared
+usage means VRAM overflowed). In the sandbox there is no CUDA device, so the
 engine falls back to the CPU. On another NVIDIA PC, copy the bundle and the two
 GGUFs and run the script there.
 

@@ -59,13 +59,42 @@ $request = Join-Path $Bundle "requests\$Fixture.json"
 $wav = Join-Path $out 'audio.wav'
 $arguments = @('--model', "`"$(Join-Path $Models 'YuE2-3B-Q8_0.gguf')`"", '--vae', "`"$(Join-Path $Models 'YuE2-Vae-F32.gguf')`"",
                '--request', "`"$request`"", '--out', "`"$wav`"")
+# Power source: laptops throttle the GPU on battery, which makes timings meaningless.
+$battery = Get-CimInstance Win32_Battery -ErrorAction SilentlyContinue | Select-Object -First 1
+$report.power = if ($battery) {
+    [ordered]@{ onAC = ($battery.BatteryStatus -eq 2); batteryStatus = $battery.BatteryStatus; chargePercent = $battery.EstimatedChargeRemaining }
+} else { [ordered]@{ onAC = $true; note = 'no battery reported (desktop)' } }
+if ($battery -and $battery.BatteryStatus -ne 2) { Write-Warning 'Running on battery: GPU timings will not be representative. Plug in the charger for a timing run.' }
+# GPU telemetry every 5 seconds: memory, clocks, power, state and throttle reasons.
+$smi = Get-Command nvidia-smi -ErrorAction SilentlyContinue
+$telemetryFile = Join-Path $out 'gpu-telemetry.csv'
+$query = 'timestamp,utilization.gpu,memory.used,memory.total,clocks.sm,clocks.max.sm,power.draw,pstate,temperature.gpu,clocks_throttle_reasons.active'
+if ($smi) { Set-Content -Path $telemetryFile -Value $query -Encoding ascii }
 $watch = [Diagnostics.Stopwatch]::StartNew()
 $p = Start-Process $engine -ArgumentList $arguments -PassThru -NoNewWindow `
     -RedirectStandardError (Join-Path $out 'stderr.log') -RedirectStandardOutput (Join-Path $out 'stdout.log')
 $null = $p.Handle  # caches the handle so ExitCode is available after exit
 $modules = @{}
+# Windows counters split a process's GPU memory into dedicated (VRAM) and shared
+# (system RAM used when VRAM overflows); shared usage means spilling.
+$gpuMemory = [ordered]@{ peakDedicatedBytes = 0; peakSharedBytes = 0; samples = 0 }
+$tick = 0
 while (-not $p.HasExited -and $watch.Elapsed.TotalMinutes -lt $TimeoutMinutes) {
     try { $p.Refresh(); foreach ($m in $p.Modules) { $modules[$m.FileName] = $true } } catch { }
+    if ($tick % 5 -eq 0) {
+        if ($smi) {
+            try { & $smi.Source "--query-gpu=$query" '--format=csv,noheader,nounits' | Add-Content -Path $telemetryFile -Encoding ascii } catch { }
+        }
+        try {
+            $samples = (Get-Counter -ErrorAction Stop "\GPU Process Memory(pid_$($p.Id)_*)\Dedicated Usage", "\GPU Process Memory(pid_$($p.Id)_*)\Shared Usage").CounterSamples
+            $dedicated = ($samples | Where-Object Path -like '*dedicated usage' | Measure-Object CookedValue -Sum).Sum
+            $shared = ($samples | Where-Object Path -like '*shared usage' | Measure-Object CookedValue -Sum).Sum
+            $gpuMemory.peakDedicatedBytes = [math]::Max($gpuMemory.peakDedicatedBytes, [double]$dedicated)
+            $gpuMemory.peakSharedBytes = [math]::Max($gpuMemory.peakSharedBytes, [double]$shared)
+            $gpuMemory.samples++
+        } catch { }
+    }
+    $tick++
     Start-Sleep -Milliseconds 1000
 }
 if (-not $p.HasExited) { $p.Kill(); $report.timedOut = $true } else { $report.timedOut = $false }
@@ -73,6 +102,21 @@ $p.WaitForExit()
 $report.generationExitCode = '0x{0:X8}' -f $p.ExitCode
 $report.generationSeconds = [math]::Round($watch.Elapsed.TotalSeconds, 2)
 $report.loadedModules = @($modules.Keys | Sort-Object)
+$report.gpuProcessMemory = $gpuMemory
+if ($smi -and (Test-Path $telemetryFile)) {
+    $rows = @(Import-Csv $telemetryFile | Where-Object { $_.'memory.used' -match '^\s*[0-9]' })
+    if ($rows.Count) {
+        $report.gpuTelemetry = [ordered]@{
+            samples = $rows.Count
+            peakMemoryUsedMiB = ($rows | ForEach-Object { [int]$_.'memory.used' } | Measure-Object -Maximum).Maximum
+            memoryTotalMiB = [int]$rows[0].'memory.total'
+            medianSmClockMHz = ($rows | ForEach-Object { [int]$_.'clocks.sm' } | Sort-Object)[[int]($rows.Count / 2)]
+            maxSmClockMHz = [int]$rows[0].'clocks.max.sm'
+            peakPowerW = ($rows | ForEach-Object { [double]$_.'power.draw' } | Measure-Object -Maximum).Maximum
+            throttleReasonsSeen = @($rows | ForEach-Object { $_.'clocks_throttle_reasons.active'.Trim() } | Sort-Object -Unique)
+        }
+    }
+}
 $report.backendLines = @(Select-String -Path (Join-Path $out 'stderr.log') -Pattern '\[Load\] .* backend|ggml_cuda_init|Device 0|Pipeline\] Done|FATAL' |
     ForEach-Object { $_.Line })
 if (Test-Path $wav) {

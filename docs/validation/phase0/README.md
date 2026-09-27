@@ -14,6 +14,7 @@ order and the [shared spec](../../../spec/FEATURES.md) for product promises.
 | Windows x64 | Windows 11 Pro 10.0.26200; RTX 4090; 24,564 MiB reported VRAM; driver 617.14; compute capability 8.9; 101,960,773,632 bytes system RAM | Reference short/repeated/full technical checks passed; listening and packaging pending |
 | Linux auxiliary environment | Ubuntu 24.04.2 under WSL2; kernel 6.18.33.2-microsoft-standard-WSL2; same GPU/driver visible | Hardware visibility passed; no generation run; not native Linux release evidence |
 | Native Linux | No native Linux test host verified in this task | Not run |
+| Windows laptop (RTX 3070 Laptop, 8 GB) | Windows 11 Pro 22631, Ryzen 9 5900HX, 32 GB RAM, driver 617.14 (32.0.16.1714); on low battery during the run | Ampere correctness passed; timings not representative |
 | Linux cloud container (RTX 5090) | Vast.ai on-demand host, `nvidia/cuda:13.3.1-devel-ubuntu24.04`, RTX 5090 32 GB (compute 12.0), driver 610.57.04, 32 vCPU EPYC 7B12 | Engine build and generation passed; Blackwell evidence; not a native desktop |
 | macOS Apple Silicon | User explicitly confirmed no Mac available yet | Not run; needs hardware |
 
@@ -50,6 +51,7 @@ and Ninja 1.13.2 are pip packages in ignored `.phase0/build-tools-venv`, not PAT
 | Blind listening, reference vs C++ Q8 (Windows) | Recorded; one reviewer | [Review](windows-listening-review-1.json): all four takes pass overall; C++ candidate preferred for short and full; one distorted take per engine; small sample with listed blinding limits |
 | Pinned NVIDIA cuBLAS runtime pack (Windows) | Passed | [Record](windows-runtime-pack.json): archive matched pinned size/SHA-256; allow-listed DLLs identical to the tested toolkit copies and NVIDIA-signed; short fixture with no toolkit on PATH loaded cuBLAS only from the pack and reproduced the WAV hash |
 | Pinned NVIDIA cuBLAS runtime pack (Linux) | Passed on the RTX 5090 container; CUDA runtime also needed | [Pins](runtime-packs.lock.json): archive matched its manifest SHA-256; libraries extracted without following symlinks. With only the pack on the library path, cuBLAS loaded from it and the WAV matched, but `libcudart.so.13` came from the toolkit: the Linux build links it dynamically. It is now pinned as `cudart-13.3.29-linux-x64` (1.6 MB) and verified; not yet run from the pack |
+| C++ kit on RTX 3070 Laptop GPU (Ampere) | Correctness passed; timing not representative | [Record](windows-rtx3070-laptop.json): sm_86 short and full songs valid on CUDA, kit DLLs loaded; ran on low battery (short 243 s, full 1,857 s), so speed and the 8 GB VRAM question need a rerun on AC power |
 | Linux C++ CUDA on RTX 5090 (cloud) | Passed technical checks; listening pending | [Record](linux-cloud-rtx5090.json): build 305 s; short 8.5 s, full 30.2-30.4 s over four runs; identical WAVs across processes; termination under 0.14 s; glibc floor 2.38; absolute RUNPATH to fix for packaging |
 | C++ forced termination per stage | Passed | [Record](windows-cpp-termination.json): exit within 80 ms and device GPU memory back to baseline within 140 ms at load/score/semantic/acoustic/decode; no leftover files; final write phase not probed |
 | C++ kill during final write | Failure mode confirmed | [Record](windows-cpp-final-write.json): a kill mid-write left a WAV 556 bytes short that still parses and plays; kills after writing exit 1 with complete files. Worker must stage and promote outputs |
@@ -328,9 +330,10 @@ Next work, by what it needs:
 - A human reviewer, later: more takes and reviewers once other targets produce
   audio; the first Windows review is recorded.
 - Other hardware: a clean Windows machine with only the NVIDIA driver (the
-  clean-image DLL check passed in Windows Sandbox); Turing and Ampere GPUs for
-  architecture coverage (Blackwell passed on a cloud RTX 5090; an RTX 30-series
-  kit is ready); a native Linux desktop; Apple Silicon for Metal. None of these
+  clean-image DLL check passed in Windows Sandbox); a timing rerun of the RTX
+  3070 Laptop on AC power (Ampere correctness passed; the kit now records power,
+  GPU telemetry, and shared-memory spill); a Turing GPU; a native Linux desktop;
+  Apple Silicon for Metal. None of these
   can be counted as passing until run.
 - Here: the Windows C++ feasibility checks this machine can run are done.
   Native Linux and Apple Silicon hardware validation remain explicit open gates.
