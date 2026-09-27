@@ -194,6 +194,16 @@ usage means VRAM overflowed). In the sandbox there is no CUDA device, so the
 engine falls back to the CPU. On another NVIDIA PC, copy the bundle and the two
 GGUFs and run the script there.
 
+## Model conversion and mirror staging
+
+The project's own conversion uses the pinned yue2.cpp `convert.py` (functions
+`convert_backbone` and `convert_vae`, run in `.phase0/conversion/` with hard
+links to the verified m-a-p checkpoints and a venv with `gguf` 0.19.0 and
+`numpy` 2.2.6), then the pinned `quantize` tool (`Q8_0`). See
+[`own-conversion.json`](../../docs/validation/phase0/own-conversion.json).
+`mirror/stage-mirror.py` stages the upload set with the original LICENSE and
+notices, `mirror/CONVERSION.md`, and `SHA256SUMS`.
+
 ## Other platforms
 
 [`MACOS-RUNBOOK.md`](MACOS-RUNBOOK.md) is the step-by-step procedure for the

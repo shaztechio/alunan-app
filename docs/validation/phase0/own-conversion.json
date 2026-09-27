@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "status": "converted-and-verified-not-yet-hosted",
+  "observedAt": "2026-09-27",
+  "decision": "Owner decision 2026-09-27: host the project's own conversion on the Cloudflare R2 mirror (FEATURES.md section 5)",
+  "inputs": {
+    "m-a-p/YuE2-3B": {
+      "revision": "14fc6c6f146441b1dd6363fcb2e01e82a6914cb7",
+      "files": {
+        "model.safetensors": "1d55c42c1a9875c34f5d736e15078449992b044e807ce2a138e6cf289a1e59e9",
+        "config.json": "ad3477bbef890bf98ae196c1e4b44779494a6231c4ab66f32708eabadf265329",
+        "qwen.tiktoken": "b2b1b8dfb5cc5f024bafc373121c6aba3f66f9a5a0269e243470a1de16a33186"
+      }
+    },
+    "m-a-p/YuE2-Vae": {
+      "revision": "9a94e1d0ea9f8087e98f77fa88df4a4068104d2a",
+      "files": {
+        "model.safetensors": "807ce9d5149fa27c5ad3e6582058469852e908f6c5acc8c8aa338e7ab7751346",
+        "config.json": "f0191bb9694009956de44e0c361a6f1334760be4c8f848e599bde242a54a0970"
+      }
+    }
+  },
+  "tools": {
+    "convert.py": {
+      "source": "yue2.cpp f17d5268483db25c9d79a9d53967f9d31fd1ccd3, unmodified",
+      "sha256": "dee56ecdef0b3e37f50ee07d8cb04a82e462e95ab1fd2c32e5bc2c11620f8d08",
+      "invocation": "convert.convert_backbone() and convert.convert_vae() called directly, skipping the transcriber that main() also converts"
+    },
+    "python": {
+      "python": "3.12.9",
+      "gguf": "0.19.0",
+      "numpy": "2.2.6"
+    },
+    "quantize.exe": {
+      "source": "yue2.cpp f17d526 tools/quantize.cpp, built with the sm_89 toolchain in windows-cpp-build.json",
+      "sha256": "5eb458fcdd0e99b5a5f48e254a9d382f39fad0b58ee7b9b254daa501caf8a040",
+      "invocation": "quantize YuE2-3B-BF16.gguf YuE2-3B-Q8_0.gguf Q8_0",
+      "seconds": 15
+    }
+  },
+  "outputs": {
+    "YuE2-3B-BF16.gguf": {
+      "bytes": 7166072320,
+      "sha256": "0c8beac07fd2c13d95ca6f1c95b1e0d3ac816316c410ede88cb85826fe38c5c8",
+      "hosted": false
+    },
+    "YuE2-3B-Q8_0.gguf": {
+      "bytes": 3810232032,
+      "sha256": "0d6ecb65cd27a20dd24e08ac46b99d0d991087782180399b532019c55c8759f7",
+      "hosted": true
+    },
+    "YuE2-Vae-F32.gguf": {
+      "bytes": 530497344,
+      "sha256": "93e49dfb1970e89ad64cacb17cf13b5d05f6bb30ef7ed3adae3050bcb728638a",
+      "hosted": true
+    }
+  },
+  "comparisonWithTestedCommunityFiles": {
+    "YuE2-Vae-F32.gguf": "byte-identical (same SHA-256 as Serveurperso/YuE2-GGUF at 64b030e3)",
+    "YuE2-3B-Q8_0.gguf": "all 627 tensors identical in name, type, shape and bytes; the files differ only by the header key yue2.block_count, present in the community file and absent from ours (32 bytes). The engine reads the layer count (28) from the embedded config",
+    "generation": "short fixture with our files on the RTX 4090: exit 0, WAV SHA-256 7c7025c597fee071e0c4b40d6a8915d4e1bd384ccc4375db4b6c319a31adadca, byte-identical to the tested reference"
+  },
+  "mirrorUploadSet": {
+    "staging": ".phase0/mirror-staging/yue2-cpp-q8-v1 (tools/phase0/mirror/stage-mirror.py)",
+    "files": [
+      "YuE2-3B-Q8_0.gguf",
+      "YuE2-Vae-F32.gguf",
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.md",
+      "licenses/SnakeBeta-NVIDIA-MIT.txt",
+      "licenses/stable-audio-tools-MIT.txt",
+      "CONVERSION.md",
+      "SHA256SUMS"
+    ],
+    "totalBytes": 4340754842,
+    "conversionNote": "tools/phase0/mirror/CONVERSION.md: attribution, source revisions, changes made, tools, license (CC BY-NC 4.0 adaptation, non-commercial)"
+  },
+  "openItems": [
+    "Choose the mirror domain and bucket layout, upload the staged set, and pin the mirror URLs in the catalog",
+    "Decide the Hugging Face alternate: this same conversion in a project-controlled repository (same digests) or the community GGUF (separate pins)",
+    "Confirm with the YuE2 authors that the individual creator permission covers this conversion"
+  ]
+}
