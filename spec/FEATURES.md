@@ -1,4 +1,4 @@
-# Lagu shared feature specification
+# Alunan shared feature specification
 
 Status: Phase 0 research baseline; native application features are unimplemented.
 Last updated: 2026-09-26.
@@ -17,18 +17,18 @@ questions are not claims of implemented support.
 
 ## 1. Product and scope
 
-Lagu lets a non-technical user install an application, enter lyrics and a musical
+Alunan lets a non-technical user install an application, enter lyrics and a musical
 style, generate music locally, listen, and save the result.
 
 | ID | Requirement |
 | --- | --- |
 | APP-001 | Windows MUST use WinForms; Linux MUST use GTK 4 through Gir.Core; macOS MUST use Swift with native Apple UI frameworks. |
-| APP-002 | A supported machine MUST need only the Lagu application installation. The package MUST include the required application runtimes, engine, and redistributable libraries, except vendor GPU runtime packs that the app itself prepares under MOD-015. No terminal, Python/pip, Homebrew, .NET, GTK, or CUDA toolkit setup may be delegated to the user. |
+| APP-002 | A supported machine MUST need only the Alunan application installation. The package MUST include the required application runtimes, engine, and redistributable libraries, except vendor GPU runtime packs that the app itself prepares under MOD-015. No terminal, Python/pip, Homebrew, .NET, GTK, or CUDA toolkit setup may be delegated to the user. |
 | APP-003 | The app MUST start, supervise, stop, and clean up its generation helper automatically. No separately launched server, console window, port entry, service configuration, or login is required. |
 | APP-004 | Music generation, playback, projects, and installed-model checks MUST run locally. Lyrics, scores, reference media, and generated audio MUST NOT be uploaded for inference. No telemetry is included in the MVP. |
 | APP-005 | The app MUST download model data, and any GPU runtime pack the selected profile requires (MOD-015), only when needed for a user-requested operation, or when the user explicitly selects Download in model settings. Launching the app alone MUST NOT download models or runtime packs. |
 | APP-006 | Standard application installers MUST contain runtime dependencies and MUST NOT bundle model weights or vendor GPU runtime packs. Internet is needed to acquire missing models and runtime packs; a complete installed model and its runtime pack MUST work offline. Separate model packs support offline import. This supersedes the earlier plan to bundle a default model in every installer; excluding vendor GPU libraries was decided on 2026-09-26 because they would dominate installer size. |
-| APP-007 | The application MUST be free, and Lagu-authored source MUST use Apache-2.0 (selected on 2026-09-26). Third-party code and model weights retain their own licenses, including any use restrictions; the app MUST identify those separately. |
+| APP-007 | The application MUST be free, and Alunan-authored source MUST use Apache-2.0 (selected on 2026-09-26). Third-party code and model weights retain their own licenses, including any use restrictions; the app MUST identify those separately. |
 
 The supported hardware/OS matrix is a release deliverable. Working operating
 system graphics drivers remain a machine prerequisite. The installer must not
@@ -62,7 +62,7 @@ integration are deferred. Saving a generated score does not imply an MVP score e
 
 Suggested first-use copy:
 
-> This song needs a music-model download (about {size}). Lagu saves the files for
+> This song needs a music-model download (about {size}). Alunan saves the files for
 > reuse and starts generating automatically when they are ready.
 
 When a GPU runtime pack is also missing, say so in the same notice, for example
@@ -159,7 +159,7 @@ app offers it only through an explicit switch after the mirror fails, and pins
 its files separately. Advanced arbitrary repositories and user-configured
 sources remain deferred. The mirror is free and non-commercial, as the weight
 license requires.
-Bunyi's production model URLs and credentials are not Lagu defaults.
+Bunyi's production model URLs and credentials are not Alunan defaults.
 
 ## 6. Results, projects, and privacy
 
@@ -204,7 +204,7 @@ accessibility testing. Successful compilation alone does not establish parity.
 | AC-012 Crash and stale events | APP-003, GEN-008..010, NET-001 | Kill the helper/app during download, generation, and save. Recover draft/cache; no orphan helper, late success, or stale playback. |
 | AC-013 Project portability | OUT-001..004 | Open and play a project on each OS without its model cache. Re-generation clearly prepares a compatible profile when needed. |
 | AC-014 Storage lifecycle | MOD-004, MOD-011..015, OUT-005 | Upgrade, Verify, Remove, local import, and simultaneous app instances preserve projects and cache correctness. |
-| AC-015 Native usability | APP-007, DL-009, UX-001..005 | Keyboard/screen-reader use and display scaling keep progress, Stop, recovery, Help, and license information usable. Credits identify Lagu's Apache-2.0 source license separately from dependency and model terms. |
+| AC-015 Native usability | APP-007, DL-009, UX-001..005 | Keyboard/screen-reader use and display scaling keep progress, Stop, recovery, Help, and license information usable. Credits identify Alunan's Apache-2.0 source license separately from dependency and model terms. |
 | AC-016 Full-song quality | GEN-007, GEN-010, OUT-002..003 | Real hardware produces audible songs, reports truncation honestly, and records the engine/model settings used. An engine run that reports success but yields silent or non-finite audio (for example with same-size corrupted decoder weights) ends as a failure with a Verify suggestion, and no take is added. |
 | AC-017 GPU runtime pack | MOD-012..013, MOD-015 | Wrong archive digest, extra or traversal archive entries, a tampered same-size runtime file, and a same-named library planted in PATH, the app folder, or the working directory are rejected or never loaded. Importing the pinned vendor archive offline works. A machine whose backend needs no pack downloads none. |
 | AC-018 No-GPU slow mode | GEN-011, MOD-009 | On a machine without a supported GPU (and a GPU driver that fails to initialize), the app states that no supported GPU was found and shows the measured estimate before any CPU generation; nothing runs on the CPU without the user's choice. |

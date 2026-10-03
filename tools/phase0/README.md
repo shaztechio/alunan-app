@@ -67,10 +67,10 @@ an audio listening review, or a clean-machine packaging check.
 ## C++ candidate build recipe (executed on Windows 2026-09-26)
 
 Use a detached checkout at the recorded C++ commit and its pinned GGML submodule;
-check both before building. Avoid a bare source archive inheriting Lagu's Git
+check both before building. Avoid a bare source archive inheriting Alunan's Git
 identity through the upstream version-generation script. MSVC C++ Build Tools,
 CMake, and the CUDA build toolkit are developer requirements. They are not user
-installation requirements for Lagu.
+installation requirements for Alunan.
 
 From a configured developer environment, configure with `GGML_CUDA=ON`,
 `GGML_NATIVE=OFF`, and an explicit tested architecture list (89 for the local

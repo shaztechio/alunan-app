@@ -1,4 +1,4 @@
-"""Developer-only local YuE2 benchmark; not the Lagu worker protocol."""
+"""Developer-only local YuE2 benchmark; not the Alunan worker protocol."""
 from __future__ import annotations
 
 import argparse

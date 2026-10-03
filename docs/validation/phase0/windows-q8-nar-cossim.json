@@ -8,7 +8,7 @@
   "fixture": {
     "path": "tests/request0.json (upstream)",
     "sha256": "1e66647d1e9fdb6907ec9ba994e388f113c1443593ba3567e4d87ef9f1ca69f0",
-    "note": "Upstream fixture with supplied score and semantic stream; not a Lagu fixture"
+    "note": "Upstream fixture with supplied score and semantic stream; not a Alunan fixture"
   },
   "scope": "Shared AR sequence and initial noise isolate prefill, 32-step flow matching and VAE decode. AR logits/sampling (LM parity) not run: upstream harness targets a BF16 GGUF outside the pinned Q8 profile.",
   "cosine": {

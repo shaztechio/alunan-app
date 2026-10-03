@@ -77,13 +77,13 @@ The following is a planned layout, not a list of files already implemented:
 ```text
 apps/
   dotnet/
-    src/Lagu.Core/                 # UI-independent application services
-    src/Lagu.Windows/              # WinForms controls and Windows integration
-    src/Lagu.Linux/                # GTK 4/Gir.Core controls and Linux integration
+    src/Alunan.Core/                 # UI-independent application services
+    src/Alunan.Windows/              # WinForms controls and Windows integration
+    src/Alunan.Linux/                # GTK 4/Gir.Core controls and Linux integration
     tests/                        # core contracts and platform adapter checks
   macos/
-    Sources/LaguCore/              # Swift services and contract implementation
-    Sources/LaguApp/               # SwiftUI/AppKit and macOS integration
+    Sources/AlunanCore/              # Swift services and contract implementation
+    Sources/AlunanApp/               # SwiftUI/AppKit and macOS integration
     Tests/
 engine/
   worker/                         # private pipe adapter around selected engine
@@ -135,7 +135,7 @@ Work:
   backend per target rather than retaining untested alternatives as promises.
 - [ ] P0-06 Inventory redistributable runtime/native libraries and model terms;
   record an open-source application-license choice and separate model notices.
-  Confirm an approved immutable download origin. A Lagu mirror is not assumed.
+  Confirm an approved immutable download origin. An Alunan mirror is not assumed.
 - [ ] P0-07 Select provisional .NET, Gir.Core, GTK, Swift, OS, and packaging
   baselines that can satisfy clean-machine installation. Separate working OS GPU
   drivers from app-bundled libraries; do not rely on a developer toolkit's PATH.
@@ -198,7 +198,7 @@ be addressed before proceeding to the full first-song flow.
 ## Phase 2 — Implement model preparation
 
 **Goal:** make first-use downloading reliable and observable, following Bunyi's
-behavior with Lagu's pinned integrity requirements.
+behavior with Alunan's pinned integrity requirements.
 
 Work:
 
@@ -439,7 +439,7 @@ than using unverified download sizes, memory figures, or calendar estimates.
 | Model mirror and conversion | End of phase 0 | Decided 2026-09-27: host the project's own conversion of the official weights on the Cloudflare R2 mirror, with Hugging Face as the explicit alternate. Still to do: produce and verify the conversion, choose the mirror domain, and pin both sources. |
 | Approved model distribution terms | End of phase 0 | Apache-2.0 source license selected and applied; exact selected components/weights still need distribution review. |
 | Candidate OS/architecture/GPU profiles and GTK baseline | End of phase 0; confirm in 6 | Actual compatibility, memory, quality, and latency evidence. |
-| Model revisions, origin, full asset set, hashes | End of phase 0; verify in 7 | Immutable files and approved distribution; no invented Lagu mirror. |
+| Model revisions, origin, full asset set, hashes | End of phase 0; verify in 7 | Immutable files and approved distribution; no invented Alunan mirror. |
 | Pipe protocol and concrete data schemas | End of phase 1 | Cross-language fixtures, responsive cancellation, and version negotiation. |
 | Linux package format and native library strategy | End of phase 1; confirm in 7 | Successful clean-machine skeleton install and final GPU qualification. |
 | Release signing identities and distribution access | Before phase 7 | Configured release credentials and tested packaging workflow. |

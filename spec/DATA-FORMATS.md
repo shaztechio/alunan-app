@@ -21,7 +21,7 @@ meaning shared by all three apps, regardless of implementation language.
 ## Model catalog and manifests
 
 The app ships immutable catalog data with its engine/runtime. There are no real
-Lagu model URLs, digests, or size promises in this initial spec; release artifacts
+Alunan model URLs, digests, or size promises in this initial spec; release artifacts
 must contain verified values before a model can be offered.
 
 | Record | Required meaning |

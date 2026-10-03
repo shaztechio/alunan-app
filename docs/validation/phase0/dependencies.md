@@ -11,9 +11,9 @@ still required. No installer or model mirror has been approved by this record.
 | Official YuE2 0.1.6 | [source lock](source-pins.json), source LICENSE and THIRD_PARTY_NOTICES.md | Apache-2.0 code. Preserve Apache license/notices and identified MIT VAE/SnakeBeta notices. Bundle code at build time. |
 | yue2.cpp | `f17d5268…`; inspected LICENSE | MIT. Preserve notice; independent implementation remains a candidate pending parity checks. |
 | GGML fork | `765bc96f…`; exact upstream gitlink, inspected LICENSE | MIT; platform backends add their own runtime dependencies. |
-| yyjson, cpp-httplib, mp3enc | Vendored at the frozen yue2.cpp revision; notices inspected | MIT notices. HTTP is unnecessary for Lagu's CLI/pipe path. WAV avoids a user-visible MP3 feature, but linked/header-included components still require an inventory. |
+| yyjson, cpp-httplib, mp3enc | Vendored at the frozen yue2.cpp revision; notices inspected | MIT notices. HTTP is unnecessary for Alunan's CLI/pipe path. WAV avoids a user-visible MP3 feature, but linked/header-included components still require an inventory. |
 | minimp3 | Vendored header at the same revision | Public-domain dedication in header; preserve source provenance. |
-| YuE2Mac reference | `a67de3ed…`; LICENSE.txt | MIT app code; MLX engine and model conversion sources need separate review if selected. No code copied into Lagu. |
+| YuE2Mac reference | `a67de3ed…`; LICENSE.txt | MIT app code; MLX engine and model conversion sources need separate review if selected. No code copied into Alunan. |
 | YuE2 generator/default VAE | [model lock](model-profiles.lock.json), upstream LICENSE downloaded at immutable revisions | CC-BY-NC-4.0 with additional individual-creator permission. App source licensing does not remove weight restrictions. |
 | Q8 GGUF conversion | `Serveurperso/YuE2-GGUF` at `64b030e3…`; model LICENSE identical to official model LICENSE | Adapted weights retain model terms. Identify original sources and conversion/quantization. Verify provenance before release endorsement. |
 | Tokenizer/config files | Hashes in reference profile | Do not assume the weight license covers every non-weight artifact; tokenizer provenance/terms require final confirmation. |
@@ -22,7 +22,7 @@ Official model license inspected:
 [MODEL_LICENSE at the source pin](https://github.com/multimodal-art-projection/YuE/blob/72272f907522dcca2e97c848d6c8f0d343999183/MODEL_LICENSE).
 It distinguishes individual output monetization, non-commercial academic use,
 and company commercial use. Its additional permission does not extend to commercial
-redistribution/sale of weights. Lagu must show these terms separately (APP-007,
+redistribution/sale of weights. Alunan must show these terms separately (APP-007,
 UX-004); a free open-source app does not make all model uses unrestricted.
 
 Use the public revision URLs on Hugging Face as research origins. Metadata reported
@@ -47,7 +47,7 @@ PyTorch includes numerous CUDA/cuDNN/BLAS DLLs: inspection found `torch_cuda.dll
 `cublasLt64_12.dll`, cuDNN engine DLLs, cuSPARSE, cuFFT, and cuSOLVER. Their size and
 dependency closure make this a heavier packaging fallback than the proposed C++
 worker. The benchmark environment is a developer venv, not proof of a standalone
-Lagu install. Python, libsndfile, NumPy BLAS, OpenMP and all native wheel components
+Alunan install. Python, libsndfile, NumPy BLAS, OpenMP and all native wheel components
 need licenses and clean-machine dependency checks if that backend ships.
 
 ## Native application/runtime candidates
@@ -61,7 +61,7 @@ need licenses and clean-machine dependency checks if that backend ships.
 | MSVC runtime | Windows C++ build dependency; the built binaries import MSVCP140, VCRUNTIME140/140_1 and VCOMP140 (OpenMP) | Use permitted redistributables or validated static runtime strategy; no user-installed build tools. |
 | CUDA runtime / cuBLAS | NVIDIA redistributables listed in the [CUDA EULA](https://docs.nvidia.com/cuda/eula/index.html). The CUDA 13.3 C++ build links cudart statically and imports `cublas64_13.dll` (52.7 MB), which needs `cublasLt64_13.dll` (463.7 MB); see [build record](windows-cpp-build.json). Decision 2026-09-26: not bundled; downloaded on demand from NVIDIA's pinned redistributable archive as a GPU runtime pack (FEATURES.md MOD-015). Archive verified 2026-09-26: DLLs identical to the tested copies and NVIDIA-signed ([record](windows-runtime-pack.json)); the bundled license lists the CUDA BLAS library as distributable with applications. End-user download: the project owner accepted their own reading of the terms on 2026-09-26 (no sign-in or click-through gate observed); the app shows the archive's NVIDIA license. Linux also needs `libcudart.so.13` (CUDA runtime 13.3.29, 782 KB), linked dynamically there and pinned as a second pack | Review the exact toolkit version's redistributable list and ship only permitted required files/notices. GPU driver stays an OS prerequisite. |
 
-Lagu source license: **Apache-2.0**, selected by the user on 2026-09-26 and applied
+Alunan source license: **Apache-2.0**, selected by the user on 2026-09-26 and applied
 in [LICENSE](../../../LICENSE). Tokenizer review, native-library versions, and
 release redistribution approval remain open P0-06 work. Nothing here grants
 rights beyond upstream terms.
