@@ -1,4 +1,4 @@
-# Lagu repository guidance
+# Alunan repository guidance
 
 Phase 0 feasibility work is authorized and in progress. The repository contains
 specifications and developer research tools; native application implementation
@@ -112,7 +112,7 @@ Implement and operate them on the model proven in bunyi-app:
 
 ## Active workspace
 
-The repository moved to `C:\Users\shazron\Documents\git\github.com\shaztechio\alunan-app`.
-Use that explicit working directory if this chat still starts in `lagu-app`.
+Use the active `alunan-app` checkout as the working directory. If this chat
+starts in the old checkout, switch to the active repository root before working.
 See `docs/workspace-relocation.md`. The research venv was recreated from the hash
 lock on 2026-09-26; keep historical evidence intact.

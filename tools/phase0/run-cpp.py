@@ -1,4 +1,4 @@
-"""Developer-only yue2.cpp CLI benchmark; not the Lagu worker protocol.
+"""Developer-only yue2.cpp CLI benchmark; not the Alunan worker protocol.
 
 Runs the pinned yue-synth binary once per process against the pinned Q8
 profile, converting a fixed Phase 0 request into the C++ schema. Never starts

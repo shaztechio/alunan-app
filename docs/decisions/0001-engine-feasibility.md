@@ -8,7 +8,7 @@ Scope: Phase 0. [FEATURES.md](../../spec/FEATURES.md) remains authoritative.
 Evaluate `yue2.cpp` with Q8_0 generator and F32 decoder as the preferred compact
 candidate for Windows/Linux CUDA and macOS Metal. Keep the official YuE2 BF16
 pipeline as the numerical and listening reference. This is an evaluation order,
-not a claim that the C++ implementation meets Lagu's quality or platform gates.
+not a claim that the C++ implementation meets Alunan's quality or platform gates.
 
 Initial Windows evidence: the pinned official default `torch` backend fails at
 CUDA graph decode because the Windows wheel was built without its required flash
@@ -58,7 +58,7 @@ compatibility check must catch that before a run starts.
 The reference callback probes also expose integration gaps: an already-cancelled
 planning call loads the model before checking cancellation, and `decode()` has no
 cancellation parameter. Do not treat the Python pipeline alone as satisfying
-Lagu's Stop contract. Retain pre-load cancellation checks and bounded process
+Alunan's Stop contract. Retain pre-load cancellation checks and bounded process
 termination in the planned coordinator/worker design.
 
 The C++ `yue-synth` CLI accepts local model paths and a request file and writes
@@ -97,7 +97,7 @@ is pinned; the legacy benchmark decoder is not silently substituted.
 
 Source archives exclude submodule content. Fetch GGML at its recorded gitlink.
 The C++ version generator searches for a parent Git repository: a bare archive
-inside this checkout can accidentally embed Lagu's commit. Build from a detached
+inside this checkout can accidentally embed Alunan's commit. Build from a detached
 upstream checkout at the pinned commit or patch the version source explicitly,
 and record that patch; never label a candidate binary with an inferred revision.
 
@@ -192,7 +192,7 @@ full-path loading so a planted same-named library cannot be picked up.
    including the GPU runtime pack pins and NVIDIA download terms.
 6. Agree on quality/latency limits from measurements.
 
-The user selected **Apache-2.0** for Lagu source on 2026-09-26; the full text is
+The user selected **Apache-2.0** for Alunan source on 2026-09-26; the full text is
 in the repository [LICENSE](../../LICENSE). Model licenses remain separate. See
 the [dependency inventory](../validation/phase0/dependencies.md).
 

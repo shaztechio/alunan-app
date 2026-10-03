@@ -1,6 +1,6 @@
 """Developer-only probe: forced termination of yue-synth at each pipeline stage.
 
-yue-synth has no cancellation channel, so Lagu's worker must be able to stop it
+yue-synth has no cancellation channel, so Alunan's worker must be able to stop it
 by terminating the process. For each stage this launches the pinned binary on
 the short fixture, waits for a stderr marker, calls TerminateProcess (via
 Popen.kill), and records: request-to-exit latency, time until device-wide GPU
